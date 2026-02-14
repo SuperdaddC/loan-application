@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Apply Online — The Colyer Team</title>
 <meta name="description" content="Start your home loan application with The Colyer Team. Fast, secure, and easy online application.">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -376,6 +377,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   </div>
 </div>
 
+<!-- Turnstile -->
+<div class="cf-turnstile" data-sitekey="0x4AAAAAACciFKo0RiY3gv0u" data-callback="onTurnstileSuccess" style="margin-top:16px;"></div>
+<input type="hidden" id="cfTurnstileResponse" name="cf_turnstile_response" value="">
+
 <!-- Buttons -->
 <div class="btn-row">
   <button type="button" class="btn btn-back" id="btnBack" style="display:none">← Back</button>
@@ -407,6 +412,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 </footer>
 
 <script>
+// Turnstile callback
+function onTurnstileSuccess(token) {
+  document.getElementById('cfTurnstileResponse').value = token;
+}
+window.onTurnstileSuccess = onTurnstileSuccess;
+
 (function(){
 'use strict';
 
@@ -679,7 +690,7 @@ btnSubmit.addEventListener('click',async()=>{
   btnSubmit.innerHTML='<span class="spinner"></span>Submitting…';
 
   try{
-    await fetch('https://apuctuqlmykeemtcasji.supabase.co/rest/v1/loan_applications',{
+    const resp = await fetch('https://apuctuqlmykeemtcasji.supabase.co/rest/v1/loan_applications',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
@@ -733,11 +744,28 @@ btnSubmit.addEventListener('click',async()=>{
           documents:uploadedFiles.map(f=>({name:f.name,size:f.size,type:f.type})),
           credit_auth_consent:true,e_signature:data.eSignature||'',
           consent_timestamp:new Date().toISOString(),
-          loan_officer_id:'57f82d21-31e6-45b9-aa0d-c7b8764f464a'
+          loan_officer_id:'57f82d21-31e6-45b9-aa0d-c7b8764f464a',
+          cf_turnstile_response:document.getElementById('cfTurnstileResponse').value||''
         };
       })())
     });
-  }catch(e){console.error('Submit error:',e);}
+    if(!resp.ok){
+      const errBody = await resp.text();
+      console.error('Submit failed:',resp.status,errBody);
+      let userMsg = 'Something went wrong submitting your application. Please try again or call us at (760) 413-2724.';
+      try{const j=JSON.parse(errBody);if(j.message)userMsg=j.message;}catch(ignored){}
+      alert(userMsg);
+      btnSubmit.disabled=false;
+      btnSubmit.innerHTML='Submit Application';
+      return;
+    }
+  }catch(e){
+    console.error('Submit error:',e);
+    alert('Network error — please check your connection and try again, or call us at (760) 413-2724.');
+    btnSubmit.disabled=false;
+    btnSubmit.innerHTML='Submit Application';
+    return;
+  }
 
   form.style.display='none';
   document.querySelector('.progress-wrap').style.display='none';
