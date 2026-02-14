@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apply Online — The Colyer Team</title>
+<meta name="description" content="Start your home loan application with The Colyer Team. Fast, secure, and easy online application.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#CF202B;--red-dark:#a8191f;--red-light:#fef2f2;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);--shadow-md:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);--shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);--radius:8px;--radius-lg:12px}
+html{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--gray-800);background:#f5f5f5;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--red);text-decoration:none}
+.ohnohoney{opacity:0;position:absolute;top:0;left:0;height:0;width:0;z-index:-1;overflow:hidden}
+
+/* Header */
+.header{background:#fff;border-bottom:3px solid var(--red);padding:16px 24px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.header img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--gray-200)}
+.header-info{text-align:left}
+.header-info h1{font-size:1.25rem;font-weight:700;color:var(--gray-900)}
+.header-info p{font-size:.8rem;color:var(--gray-500);margin-top:2px}
+.header-info a{color:var(--red);font-weight:500}
+
+/* Main container */
+.main{flex:1;max-width:720px;width:100%;margin:24px auto;padding:0 16px}
+.card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);overflow:hidden}
+
+/* Progress */
+.progress-wrap{padding:24px 32px 0;position:relative}
+.progress-steps{display:flex;justify-content:space-between;margin-bottom:8px;font-size:.7rem;color:var(--gray-400);font-weight:500}
+.progress-steps span.active{color:var(--red);font-weight:600}
+.progress-steps span.done{color:var(--gray-600)}
+.progress-bar{height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--red),#e74c4c);border-radius:3px;transition:width .4s ease}
+.step-title{margin-top:20px;font-size:1.35rem;font-weight:700;color:var(--gray-900)}
+.step-subtitle{font-size:.9rem;color:var(--gray-500);margin-top:4px}
+
+/* Form */
+.form-body{padding:24px 32px 32px}
+.step{display:none}
+.step.active{display:block}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-row.single{grid-template-columns:1fr}
+.form-row.triple{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column}
+.form-group label{font-size:.8rem;font-weight:600;color:var(--gray-700);margin-bottom:6px}
+.form-group .req{color:var(--red)}
+.form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:.9rem;font-family:inherit;color:var(--gray-800);background:#fff;transition:border-color .2s,box-shadow .2s;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(207,32,43,.1)}
+.form-group input.invalid,.form-group select.invalid{border-color:var(--red);background:var(--red-light)}
+.form-group .error-msg{font-size:.75rem;color:var(--red);margin-top:4px;display:none}
+.form-group input.invalid~.error-msg,.form-group select.invalid~.error-msg{display:block}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+
+/* Radio/check cards */
+.option-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.option-grid.col3{grid-template-columns:1fr 1fr 1fr}
+.option-card{position:relative;border:2px solid var(--gray-200);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:#fff}
+.option-card:hover{border-color:var(--gray-400);background:var(--gray-50)}
+.option-card.selected{border-color:var(--red);background:var(--red-light)}
+.option-card input{position:absolute;opacity:0;width:0;height:0}
+.option-card .icon{font-size:1.5rem;margin-bottom:6px}
+.option-card .label{font-size:.85rem;font-weight:600;color:var(--gray-700)}
+.option-card.selected .label{color:var(--red)}
+
+/* Yes/No declarations */
+.decl-item{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--gray-100)}
+.decl-item:last-child{border-bottom:none}
+.decl-text{font-size:.85rem;color:var(--gray-700);flex:1;margin-right:16px}
+.decl-toggle{display:flex;gap:8px}
+.decl-toggle label{padding:6px 16px;border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
+.decl-toggle label:hover{border-color:var(--gray-400)}
+.decl-toggle input{display:none}
+.decl-toggle input:checked+label,.decl-toggle label.sel{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* Upload zone */
+.upload-zone{border:2px dashed var(--gray-300);border-radius:var(--radius-lg);padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray-50)}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--red);background:var(--red-light)}
+.upload-zone .icon{font-size:2.5rem;margin-bottom:8px}
+.upload-zone p{font-size:.9rem;color:var(--gray-500)}
+.upload-zone .browse{color:var(--red);font-weight:600;text-decoration:underline;cursor:pointer}
+.file-list{margin-top:16px}
+.file-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--gray-50);border-radius:var(--radius);margin-bottom:8px;font-size:.85rem}
+.file-item .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:12px}
+.file-item .size{color:var(--gray-400);margin-right:12px;flex-shrink:0}
+.file-item .remove{color:var(--red);cursor:pointer;font-weight:700;font-size:1.1rem;flex-shrink:0}
+
+/* Review summary */
+.review-section{margin-bottom:20px}
+.review-section h3{font-size:.9rem;font-weight:700;color:var(--red);border-bottom:2px solid var(--red-light);padding-bottom:6px;margin-bottom:10px}
+.review-row{display:flex;justify-content:space-between;padding:4px 0;font-size:.85rem}
+.review-row .rlabel{color:var(--gray-500)}
+.review-row .rval{font-weight:500;color:var(--gray-800);text-align:right;max-width:60%}
+
+/* Consent */
+.consent-box{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:16px;margin:16px 0;font-size:.8rem;color:var(--gray-600);line-height:1.6;max-height:200px;overflow-y:auto}
+.check-row{display:flex;align-items:flex-start;gap:10px;margin:12px 0;font-size:.85rem;color:var(--gray-700)}
+.check-row input[type=checkbox]{margin-top:3px;accent-color:var(--red);width:18px;height:18px;flex-shrink:0}
+.sig-group{margin-top:16px}
+.sig-group label{font-size:.8rem;font-weight:600;color:var(--gray-700);display:block;margin-bottom:6px}
+.sig-group input{width:100%;padding:12px 16px;border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:1.1rem;font-family:'Brush Script MT',cursive,'Inter',sans-serif;font-style:italic;outline:none}
+.sig-group input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(207,32,43,.1)}
+
+/* Buttons */
+.btn-row{display:flex;justify-content:space-between;margin-top:24px;gap:12px}
+.btn{padding:12px 28px;border-radius:var(--radius);font-size:.9rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;border:none}
+.btn-back{background:var(--gray-100);color:var(--gray-600)}.btn-back:hover{background:var(--gray-200)}
+.btn-next{background:var(--red);color:#fff;margin-left:auto}.btn-next:hover{background:var(--red-dark)}
+.btn-next:disabled{opacity:.5;cursor:not-allowed}
+.btn-submit{background:var(--red);color:#fff;font-size:1rem;padding:14px 40px;margin-left:auto}.btn-submit:hover{background:var(--red-dark)}
+
+/* Success */
+.success-screen{display:none;text-align:center;padding:60px 32px}
+.success-screen .checkmark{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);margin:0 auto 24px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:#fff}
+.success-screen h2{font-size:1.5rem;font-weight:700;color:var(--gray-900);margin-bottom:8px}
+.success-screen p{color:var(--gray-500);font-size:.95rem;margin-bottom:6px}
+
+/* Footer */
+.footer{text-align:center;padding:24px 16px;font-size:.75rem;color:var(--gray-400);line-height:1.8}
+.footer .ehl{font-weight:600;font-size:.8rem}
+
+/* Responsive */
+@media(max-width:600px){
+  .form-row,.form-row.triple{grid-template-columns:1fr}
+  .option-grid,.option-grid.col3{grid-template-columns:1fr 1fr}
+  .form-body{padding:20px 16px 24px}
+  .progress-wrap{padding:20px 16px 0}
+  .header{padding:12px 16px}
+  .btn{padding:10px 20px;font-size:.85rem}
+}
+
+/* Spinner */
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <img src="https://apuctuqlmykeemtcasji.supabase.co/storage/v1/object/public/profile-photos/57f82d21-31e6-45b9-aa0d-c7b8764f464a/1770136298733-ri7748.png" alt="Michael Colyer" width="64" height="64">
+  <div class="header-info">
+    <h1>The Colyer Team</h1>
+    <p>Michael Colyer · NMLS #276626 · <a href="tel:6502888170">(650) 288-8170</a> · <a href="mailto:Mike@TheColyerTeam.com">Mike@TheColyerTeam.com</a></p>
+  </div>
+</header>
+
+<main class="main">
+<div class="card">
+
+<!-- Progress -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:11.1%"></div></div>
+  <h2 class="step-title" id="stepTitle">Loan Purpose</h2>
+  <p class="step-subtitle" id="stepSubtitle">Let's get started — what are you looking for?</p>
+</div>
+
+<form id="loanForm" novalidate autocomplete="off">
+<!-- Honeypot -->
+<div class="ohnohoney"><label>Leave blank<input type="text" name="website" id="ohnohoney" tabindex="-1" autocomplete="off"></label></div>
+<input type="hidden" id="formLoadTime">
+
+<div class="form-body">
+
+<!-- Step 1: Loan Purpose -->
+<div class="step active" data-step="1">
+  <label style="font-size:.8rem;font-weight:600;color:var(--gray-700);margin-bottom:10px;display:block">Loan Purpose <span class="req">*</span></label>
+  <div class="option-grid col3" data-field="loanPurpose">
+    <label class="option-card"><input type="radio" name="loanPurpose" value="Purchase"><div class="icon">🏠</div><div class="label">Purchase</div></label>
+    <label class="option-card"><input type="radio" name="loanPurpose" value="Refinance"><div class="icon">🔄</div><div class="label">Refinance</div></label>
+    <label class="option-card"><input type="radio" name="loanPurpose" value="Cash-Out Refi"><div class="icon">💰</div><div class="label">Cash-Out Refi</div></label>
+  </div>
+  <label style="font-size:.8rem;font-weight:600;color:var(--gray-700);margin-bottom:10px;display:block">Property Type <span class="req">*</span></label>
+  <div class="option-grid" data-field="propertyType">
+    <label class="option-card"><input type="radio" name="propertyType" value="Single Family"><div class="icon">🏡</div><div class="label">Single Family</div></label>
+    <label class="option-card"><input type="radio" name="propertyType" value="Condo"><div class="icon">🏢</div><div class="label">Condo</div></label>
+    <label class="option-card"><input type="radio" name="propertyType" value="Townhouse"><div class="icon">🏘️</div><div class="label">Townhouse</div></label>
+    <label class="option-card"><input type="radio" name="propertyType" value="Multi-Unit"><div class="icon">🏗️</div><div class="label">Multi-Unit</div></label>
+  </div>
+</div>
+
+<!-- Step 2: Property Info -->
+<div class="step" data-step="2">
+  <div class="form-row single"><div class="form-group"><label>Property Address <span class="req">*</span></label><input type="text" name="propAddress" data-min="8" autocomplete="off"><span class="error-msg">Please enter a valid address (min 8 characters)</span></div></div>
+  <div class="form-row triple">
+    <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="propCity" data-min="2" autocomplete="off"><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>State <span class="req">*</span></label><select name="propState"><option value="">Select…</option></select><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="propZip" maxlength="5" pattern="\d{5}" autocomplete="off"><span class="error-msg">5-digit ZIP</span></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Estimated Value <span class="req">*</span></label><input type="text" name="propValue" placeholder="$" autocomplete="off" inputmode="numeric"><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>Intended Use <span class="req">*</span></label><select name="propUse"><option value="">Select…</option><option>Primary Residence</option><option>Secondary Home</option><option>Investment Property</option></select><span class="error-msg">Required</span></div>
+  </div>
+</div>
+
+<!-- Step 3: Borrower Info -->
+<div class="step" data-step="3">
+  <div class="form-row">
+    <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" name="firstName" data-min="2" autocomplete="off"><span class="error-msg">Min 2 characters</span></div>
+    <div class="form-group"><label>Last Name <span class="req">*</span></label><input type="text" name="lastName" data-min="2" autocomplete="off"><span class="error-msg">Min 2 characters</span></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Email <span class="req">*</span></label><input type="email" name="email" autocomplete="off"><span class="error-msg">Valid email required</span></div>
+    <div class="form-group"><label>Phone <span class="req">*</span></label><input type="tel" name="phone" placeholder="(555) 555-5555" autocomplete="off"><span class="error-msg">10-11 digits required</span></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Date of Birth <span class="req">*</span></label><input type="date" name="dob" autocomplete="off"><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>Marital Status <span class="req">*</span></label><select name="maritalStatus"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select><span class="error-msg">Required</span></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Number of Dependents</label><input type="number" name="dependents" min="0" max="20" value="0" autocomplete="off"></div>
+    <div class="form-group"><label>Social Security Number <span class="req">*</span></label><input type="password" name="ssn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric"><span class="error-msg">9 digits required</span></div>
+  </div>
+</div>
+
+<!-- Step 4: Current Address -->
+<div class="step" data-step="4">
+  <div class="form-row single"><div class="form-group"><label>Street Address <span class="req">*</span></label><input type="text" name="curStreet" data-min="8" autocomplete="off"><span class="error-msg">Min 8 characters</span></div></div>
+  <div class="form-row triple">
+    <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="curCity" data-min="2" autocomplete="off"><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>State <span class="req">*</span></label><select name="curState"><option value="">Select…</option></select><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="curZip" maxlength="5" pattern="\d{5}" autocomplete="off"><span class="error-msg">5-digit ZIP</span></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Own or Rent <span class="req">*</span></label><select name="curOwnRent"><option value="">Select…</option><option>Own</option><option>Rent</option><option>Living Rent-Free</option></select><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>Years at Address <span class="req">*</span></label><input type="number" name="curYears" min="0" max="99" autocomplete="off"><span class="error-msg">Required</span></div>
+  </div>
+  <div id="prevAddrBlock" style="display:none">
+    <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Previous Address (less than 2 years at current)</p>
+    <div class="form-row single"><div class="form-group"><label>Street</label><input type="text" name="prevStreet" autocomplete="off"></div></div>
+    <div class="form-row triple">
+      <div class="form-group"><label>City</label><input type="text" name="prevCity" autocomplete="off"></div>
+      <div class="form-group"><label>State</label><select name="prevState"><option value="">Select…</option></select></div>
+      <div class="form-group"><label>ZIP</label><input type="text" name="prevZip" maxlength="5" autocomplete="off"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 5: Employment -->
+<div class="step" data-step="5">
+  <div class="form-row">
+    <div class="form-group"><label>Employer Name <span class="req">*</span></label><input type="text" name="empName" data-min="2" autocomplete="off"><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>Job Title <span class="req">*</span></label><input type="text" name="empTitle" data-min="2" autocomplete="off"><span class="error-msg">Required</span></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Employer Phone</label><input type="tel" name="empPhone" autocomplete="off"></div>
+    <div class="form-group"><label>Years Employed <span class="req">*</span></label><input type="number" name="empYears" min="0" max="60" autocomplete="off"><span class="error-msg">Required</span></div>
+  </div>
+  <div class="form-row single"><div class="form-group"><label>Monthly Income <span class="req">*</span></label><input type="text" name="monthlyIncome" placeholder="$" autocomplete="off" inputmode="numeric"><span class="error-msg">Required</span></div></div>
+  <div id="prevEmpBlock" style="display:none">
+    <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Previous Employer (less than 2 years at current)</p>
+    <div class="form-row">
+      <div class="form-group"><label>Employer</label><input type="text" name="prevEmpName" autocomplete="off"></div>
+      <div class="form-group"><label>Title</label><input type="text" name="prevEmpTitle" autocomplete="off"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Years</label><input type="number" name="prevEmpYears" min="0" autocomplete="off"></div>
+      <div class="form-group"><label>Monthly Income</label><input type="text" name="prevEmpIncome" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 6: Assets & Liabilities -->
+<div class="step" data-step="6">
+  <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin-bottom:12px">Assets</p>
+  <div class="form-row">
+    <div class="form-group"><label>Checking Account Balance</label><input type="text" name="checkingBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label>Savings Account Balance</label><input type="text" name="savingsBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+  </div>
+  <div class="form-row single"><div class="form-group"><label>Other Real Estate Owned (estimated value)</label><input type="text" name="otherRE" placeholder="$0" autocomplete="off" inputmode="numeric"></div></div>
+  <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 12px">Monthly Debts</p>
+  <div class="form-row">
+    <div class="form-group"><label>Auto Loan</label><input type="text" name="debtAuto" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label>Student Loans</label><input type="text" name="debtStudent" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Credit Card Payments</label><input type="text" name="debtCC" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label>Other Mortgage</label><input type="text" name="debtMortgage" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+  </div>
+</div>
+
+<!-- Step 7: Declarations -->
+<div class="step" data-step="7">
+  <div id="declarations"></div>
+</div>
+
+<!-- Step 8: Document Upload -->
+<div class="step" data-step="8">
+  <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:16px">Upload any supporting documents: W-2s, pay stubs, bank statements, tax returns, or government ID. You can also send these later.</p>
+  <div class="upload-zone" id="uploadZone">
+    <div class="icon">📄</div>
+    <p>Drag & drop files here or <span class="browse">browse</span></p>
+    <p style="font-size:.75rem;color:var(--gray-400);margin-top:8px">PDF, JPG, PNG, DOC, DOCX · Max 10MB per file · Up to 20 files</p>
+  </div>
+  <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display:none">
+  <div class="file-list" id="fileList"></div>
+</div>
+
+<!-- Step 9: Review & Submit -->
+<div class="step" data-step="9">
+  <div id="reviewSummary"></div>
+  <div class="consent-box">
+    <strong>Authorization & Consent</strong><br><br>
+    By signing below, I authorize The Colyer Team and its lending partners to verify the information provided in this application, including but not limited to employment, income, assets, and credit history. I consent to the pulling of my credit report for the purpose of evaluating my mortgage application.<br><br>
+    I certify that all information provided is true and accurate to the best of my knowledge. I understand that providing false information may result in denial of my application and potential legal consequences.<br><br>
+    I acknowledge that this application is not a commitment to lend and that all loans are subject to underwriting approval, property appraisal, and satisfaction of all applicable conditions.
+  </div>
+  <div class="check-row"><input type="checkbox" id="consentCredit"><label for="consentCredit">I authorize a credit check and verification of the information provided. <span class="req">*</span></label></div>
+  <div class="check-row"><input type="checkbox" id="consentEsign"><label for="consentEsign">I agree to conduct this transaction electronically (E-Sign consent). <span class="req">*</span></label></div>
+  <div class="sig-group">
+    <label>Electronic Signature (type your full legal name) <span class="req">*</span></label>
+    <input type="text" id="eSignature" placeholder="Your Full Legal Name" autocomplete="off">
+  </div>
+</div>
+
+<!-- Buttons -->
+<div class="btn-row">
+  <button type="button" class="btn btn-back" id="btnBack" style="display:none">← Back</button>
+  <button type="button" class="btn btn-next" id="btnNext">Continue →</button>
+  <button type="button" class="btn btn-submit" id="btnSubmit" style="display:none">Submit Application</button>
+</div>
+
+</div>
+</form>
+
+<!-- Success -->
+<div class="success-screen" id="successScreen">
+  <div class="checkmark">✓</div>
+  <h2>Application Submitted!</h2>
+  <p>Thank you for applying with The Colyer Team.</p>
+  <p><strong>We'll contact you within 1 business day.</strong></p>
+  <p style="margin-top:20px;font-size:.85rem;color:var(--gray-400)">Questions? Call <a href="tel:6502888170">(650) 288-8170</a> or email <a href="mailto:Mike@TheColyerTeam.com">Mike@TheColyerTeam.com</a></p>
+</div>
+
+</div>
+</main>
+
+<footer class="footer">
+  <div class="ehl">🏠 Equal Housing Lender</div>
+  Michael Colyer · NMLS #276626 · DRE #01842442<br>
+  1536 Mission Meadows Dr, Oceanside, CA 92057<br>
+  Rates subject to change. Not a commitment to lend. Not an offer to extend credit.<br>
+  © 2025 The Colyer Team. All rights reserved.
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+// Timestamp for bot protection
+document.getElementById('formLoadTime').value = Date.now();
+
+// States dropdown
+const states = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
+document.querySelectorAll('select[name$="State"]').forEach(sel=>{
+  states.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o)});
+});
+
+// Declarations
+const declQuestions = [
+  'Are there any outstanding judgments against you?',
+  'Have you been declared bankrupt within the past 7 years?',
+  'Have you had property foreclosed upon in the last 7 years?',
+  'Are you a party to a lawsuit?',
+  'Have you directly or indirectly been obligated on any loan which resulted in foreclosure, transfer of title in lieu of foreclosure, or judgment?',
+  'Are you presently delinquent or in default on any Federal debt?',
+  'Are you obligated to pay alimony, child support, or separate maintenance?',
+  'Is any part of the down payment borrowed?',
+  'Are you a co-maker or endorser on a note?',
+  'Are you a US citizen?',
+  'Are you a permanent resident alien?',
+  'Do you intend to occupy the property as your primary residence?'
+];
+const declContainer = document.getElementById('declarations');
+declQuestions.forEach((q,i)=>{
+  declContainer.innerHTML += `<div class="decl-item"><span class="decl-text">${q}</span><div class="decl-toggle"><input type="radio" name="decl${i}" id="decl${i}y" value="Yes"><label for="decl${i}y">Yes</label><input type="radio" name="decl${i}" id="decl${i}n" value="No"><label for="decl${i}n">No</label></div></div>`;
+});
+// Style declaration toggles
+document.querySelectorAll('.decl-toggle input').forEach(inp=>{
+  inp.addEventListener('change',()=>{
+    inp.closest('.decl-toggle').querySelectorAll('label').forEach(l=>l.classList.remove('sel'));
+    if(inp.checked) inp.nextElementSibling?.classList.add('sel') || inp.previousElementSibling?.classList.add('sel');
+    // Fix: label is the next sibling for radio
+    const lbl = document.querySelector(`label[for="${inp.id}"]`);
+    if(lbl) {inp.closest('.decl-toggle').querySelectorAll('label').forEach(l=>l.classList.remove('sel')); lbl.classList.add('sel');}
+  });
+});
+
+// Step management
+const stepData = [
+  {title:'Loan Purpose',sub:'Let\'s get started — what are you looking for?'},
+  {title:'Property Details',sub:'Tell us about the property'},
+  {title:'Your Information',sub:'We\'ll keep this secure'},
+  {title:'Current Address',sub:'Where do you live now?'},
+  {title:'Employment',sub:'Tell us about your work'},
+  {title:'Assets & Debts',sub:'Your financial picture'},
+  {title:'Declarations',sub:'Standard mortgage questions'},
+  {title:'Documents',sub:'Upload supporting files (optional)'},
+  {title:'Review & Submit',sub:'Almost done — verify and sign'}
+];
+let currentStep = 1;
+const totalSteps = 9;
+const form = document.getElementById('loanForm');
+const btnNext = document.getElementById('btnNext');
+const btnBack = document.getElementById('btnBack');
+const btnSubmit = document.getElementById('btnSubmit');
+
+function updateUI(){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+  document.getElementById('stepTitle').textContent = stepData[currentStep-1].title;
+  document.getElementById('stepSubtitle').textContent = stepData[currentStep-1].sub;
+  document.getElementById('progressFill').style.width = (currentStep/totalSteps*100)+'%';
+  btnBack.style.display = currentStep===1?'none':'inline-block';
+  btnNext.style.display = currentStep===totalSteps?'none':'inline-block';
+  btnSubmit.style.display = currentStep===totalSteps?'inline-block':'none';
+  // Progress step labels
+  const ps = document.getElementById('progressSteps');
+  ps.innerHTML = '';
+  for(let i=1;i<=totalSteps;i++){
+    const sp = document.createElement('span');
+    sp.textContent = i;
+    if(i===currentStep) sp.className='active';
+    else if(i<currentStep) sp.className='done';
+    ps.appendChild(sp);
+  }
+  if(currentStep===9) buildReview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Option cards
+document.querySelectorAll('.option-card input').forEach(inp=>{
+  inp.addEventListener('change',()=>{
+    inp.closest('.option-grid').querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+    inp.closest('.option-card').classList.add('selected');
+  });
+});
+
+// Show/hide previous address
+const curYears = document.querySelector('[name="curYears"]');
+curYears?.addEventListener('input',()=>{
+  document.getElementById('prevAddrBlock').style.display = parseInt(curYears.value)<2?'block':'none';
+});
+const empYears = document.querySelector('[name="empYears"]');
+empYears?.addEventListener('input',()=>{
+  document.getElementById('prevEmpBlock').style.display = parseInt(empYears.value)<2?'block':'none';
+});
+
+// SSN formatting
+const ssnField = document.querySelector('[name="ssn"]');
+ssnField.addEventListener('input',e=>{
+  let v = e.target.value.replace(/\D/g,'');
+  if(v.length>9) v=v.slice(0,9);
+  if(v.length>5) v=v.slice(0,3)+'-'+v.slice(3,5)+'-'+v.slice(5);
+  else if(v.length>3) v=v.slice(0,3)+'-'+v.slice(3);
+  e.target.value = v;
+});
+
+// Currency formatting
+document.querySelectorAll('[inputmode="numeric"]').forEach(inp=>{
+  inp.addEventListener('blur',()=>{
+    const v = inp.value.replace(/[^0-9.]/g,'');
+    if(v) inp.value = '$'+Number(v).toLocaleString('en-US');
+  });
+  inp.addEventListener('focus',()=>{
+    inp.value = inp.value.replace(/[^0-9.]/g,'');
+  });
+});
+
+// Phone formatting
+const phoneField = document.querySelector('[name="phone"]');
+phoneField.addEventListener('input',e=>{
+  let v = e.target.value.replace(/\D/g,'');
+  if(v.length>10) v=v.slice(0,11);
+  if(v.length>=7) v='('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);
+  else if(v.length>=4) v='('+v.slice(0,3)+') '+v.slice(3);
+  e.target.value = v;
+});
+
+// Validation
+function validateStep(step){
+  let valid = true;
+  const el = document.querySelector(`.step[data-step="${step}"]`);
+  if(step===1){
+    if(!form.loanPurpose.value){valid=false;alert('Please select a loan purpose.');}
+    else if(!form.propertyType.value){valid=false;alert('Please select a property type.');}
+    return valid;
+  }
+  // Validate required fields in step
+  el.querySelectorAll('input[type="text"],input[type="email"],input[type="tel"],input[type="date"],input[type="number"],input[type="password"],select').forEach(inp=>{
+    const lbl = inp.closest('.form-group')?.querySelector('label');
+    const required = lbl?.querySelector('.req');
+    if(!required) return;
+    inp.classList.remove('invalid');
+    let val = inp.value.trim();
+    if(!val){inp.classList.add('invalid');valid=false;return;}
+    const min = inp.dataset.min;
+    if(min && val.length<parseInt(min)){inp.classList.add('invalid');valid=false;return;}
+    if(inp.type==='email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)){inp.classList.add('invalid');valid=false;return;}
+    if(inp.name==='phone'){const digits=val.replace(/\D/g,'');if(digits.length<10||digits.length>11){inp.classList.add('invalid');valid=false;return;}}
+    if(inp.name==='ssn'){const digits=val.replace(/\D/g,'');if(digits.length!==9){inp.classList.add('invalid');valid=false;return;}}
+    if(inp.name.endsWith('Zip')&&!/^\d{5}$/.test(val)){inp.classList.add('invalid');valid=false;return;}
+  });
+  return valid;
+}
+
+// File upload
+const uploadedFiles = [];
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const fileList = document.getElementById('fileList');
+const ALLOWED = ['application/pdf','image/jpeg','image/png','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+const MAX_SIZE = 10*1024*1024;
+
+uploadZone.addEventListener('click',()=>fileInput.click());
+uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.classList.add('dragover');});
+uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop',e=>{e.preventDefault();uploadZone.classList.remove('dragover');handleFiles(e.dataTransfer.files);});
+fileInput.addEventListener('change',()=>handleFiles(fileInput.files));
+
+function handleFiles(files){
+  Array.from(files).forEach(f=>{
+    if(uploadedFiles.length>=20){alert('Maximum 20 files allowed');return;}
+    if(!ALLOWED.includes(f.type)){alert(`${f.name}: File type not accepted`);return;}
+    if(f.size>MAX_SIZE){alert(`${f.name}: File exceeds 10MB limit`);return;}
+    uploadedFiles.push(f);
+  });
+  renderFiles();
+}
+function renderFiles(){
+  fileList.innerHTML='';
+  uploadedFiles.forEach((f,i)=>{
+    const sz = f.size<1024?f.size+'B':f.size<1048576?(f.size/1024).toFixed(1)+'KB':(f.size/1048576).toFixed(1)+'MB';
+    fileList.innerHTML+=`<div class="file-item"><span class="name">📎 ${f.name}</span><span class="size">${sz}</span><span class="remove" data-i="${i}">✕</span></div>`;
+  });
+  fileList.querySelectorAll('.remove').forEach(btn=>btn.addEventListener('click',()=>{
+    uploadedFiles.splice(parseInt(btn.dataset.i),1);renderFiles();
+  }));
+}
+
+// Review
+function gv(name){const el=form.elements[name];return el?el.value||'—':'—';}
+function buildReview(){
+  const ssnRaw = gv('ssn').replace(/\D/g,'');
+  const ssnMasked = ssnRaw.length===9?'***-**-'+ssnRaw.slice(5):'—';
+  const sections = [
+    {title:'Loan Details',rows:[['Purpose',gv('loanPurpose')],['Property Type',gv('propertyType')]]},
+    {title:'Property',rows:[['Address',gv('propAddress')],['City/State/ZIP',gv('propCity')+', '+gv('propState')+' '+gv('propZip')],['Est. Value',gv('propValue')],['Use',gv('propUse')]]},
+    {title:'Borrower',rows:[['Name',gv('firstName')+' '+gv('lastName')],['Email',gv('email')],['Phone',gv('phone')],['DOB',gv('dob')],['SSN',ssnMasked],['Marital Status',gv('maritalStatus')],['Dependents',gv('dependents')]]},
+    {title:'Address',rows:[['Current',gv('curStreet')+', '+gv('curCity')+', '+gv('curState')+' '+gv('curZip')],['Own/Rent',gv('curOwnRent')],['Years',gv('curYears')]]},
+    {title:'Employment',rows:[['Employer',gv('empName')],['Title',gv('empTitle')],['Years',gv('empYears')],['Monthly Income',gv('monthlyIncome')]]},
+    {title:'Assets',rows:[['Checking',gv('checkingBal')||'$0'],['Savings',gv('savingsBal')||'$0'],['Other RE',gv('otherRE')||'$0']]},
+    {title:'Monthly Debts',rows:[['Auto',gv('debtAuto')||'$0'],['Student',gv('debtStudent')||'$0'],['Credit Cards',gv('debtCC')||'$0'],['Other Mortgage',gv('debtMortgage')||'$0']]},
+    {title:'Documents',rows:[['Files uploaded',uploadedFiles.length+' file(s)']]}
+  ];
+  let html='';
+  sections.forEach(s=>{
+    html+=`<div class="review-section"><h3>${s.title}</h3>`;
+    s.rows.forEach(r=>html+=`<div class="review-row"><span class="rlabel">${r[0]}</span><span class="rval">${r[1]}</span></div>`);
+    html+='</div>';
+  });
+  document.getElementById('reviewSummary').innerHTML=html;
+}
+
+// Navigation
+btnNext.addEventListener('click',()=>{
+  if(!validateStep(currentStep)) return;
+  currentStep++;
+  updateUI();
+});
+btnBack.addEventListener('click',()=>{
+  if(currentStep>1){currentStep--;updateUI();}
+});
+
+// Submit
+btnSubmit.addEventListener('click',async()=>{
+  // Validate consent
+  if(!document.getElementById('consentCredit').checked||!document.getElementById('consentEsign').checked){alert('Please accept both consent checkboxes.');return;}
+  if(!document.getElementById('eSignature').value.trim()){alert('Please provide your electronic signature.');return;}
+  // Honeypot
+  if(document.getElementById('ohnohoney').value){return;}
+  // Timestamp check
+  const elapsed = Date.now()-parseInt(document.getElementById('formLoadTime').value);
+  if(elapsed<10000){alert('Please take a moment to review your application.');return;}
+
+  // Gather data
+  const data = {};
+  new FormData(form).forEach((v,k)=>{if(k!=='website') data[k]=v;});
+  data.eSignature = document.getElementById('eSignature').value;
+  data.consentCredit = true;
+  data.consentEsign = true;
+  data.submittedAt = new Date().toISOString();
+  data.filesCount = uploadedFiles.length;
+
+  // Declarations
+  const decls={};
+  declQuestions.forEach((q,i)=>{
+    const v = form.elements[`decl${i}`]?.value;
+    decls[`decl_${i}`] = {question:q, answer:v||'Unanswered'};
+  });
+  data.declarations = decls;
+
+  btnSubmit.disabled=true;
+  btnSubmit.innerHTML='<span class="spinner"></span>Submitting…';
+
+  try{
+    await fetch('https://apuctuqlmykeemtcasji.supabase.co/functions/v1/loan-application',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+  }catch(e){/* endpoint not live yet */}
+
+  form.style.display='none';
+  document.querySelector('.progress-wrap').style.display='none';
+  document.querySelector('.btn-row').style.display='none';
+  document.getElementById('successScreen').style.display='block';
+});
+
+updateUI();
+})();
+</script>
+</body>
+</html>
