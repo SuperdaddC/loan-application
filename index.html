@@ -542,8 +542,9 @@ ssnField.addEventListener('input',e=>{
   e.target.value = v;
 });
 
-// Currency formatting
+// Currency formatting (exclude phone/tel fields)
 document.querySelectorAll('[inputmode="numeric"]').forEach(inp=>{
+  if(inp.type==='tel'||inp.name.toLowerCase().includes('phone')||inp.name==='ssn'||inp.name==='coBorrSsn'||inp.name==='dob'||inp.name==='coBorrDob') return;
   inp.addEventListener('blur',()=>{
     const v = inp.value.replace(/[^0-9.]/g,'');
     if(v) inp.value = '$'+Number(v).toLocaleString('en-US');
