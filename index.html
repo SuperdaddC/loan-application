@@ -121,6 +121,16 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* Footer */
 .footer{text-align:center;padding:24px 16px;font-size:.75rem;color:var(--gray-400);line-height:1.8}
 .footer .ehl{font-weight:600;font-size:.8rem}
+.footer a{color:var(--gray-400);text-decoration:underline}
+.footer a:hover{color:#fff}
+.footer-links{margin:8px 0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px}
+.compliance-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center}
+.compliance-modal-overlay.active{display:flex}
+.compliance-modal{background:#fff;color:#1f2937;border-radius:16px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:32px;position:relative}
+.compliance-modal h2{font-size:1.2rem;margin-bottom:12px}
+.compliance-modal p,.compliance-modal li{font-size:.85rem;line-height:1.6;margin-bottom:8px}
+.compliance-modal ul{padding-left:20px}
+.compliance-modal .close-btn{position:absolute;top:12px;right:16px;font-size:1.5rem;cursor:pointer;color:#4b5563;background:none;border:none}
 
 /* Responsive */
 @media(max-width:600px){
@@ -443,10 +453,24 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <footer class="footer">
   <div class="ehl">🏠 Equal Housing Lender</div>
   Michael Colyer · NMLS #276626 · DRE #01842442<br>
+  The Colyer Team · DRE #01526140<br>
+  <a href="tel:6502888170">(650) 288-8170</a> · <a href="mailto:mike@thecolyerteam.com">mike@thecolyerteam.com</a><br>
   2214 Faraday Ave, Carlsbad, CA 92008<br>
   Rates subject to change. Not a commitment to lend. Not an offer to extend credit.<br>
-  © 2025 The Colyer Team. All rights reserved.
+  <div class="footer-links">
+    <a href="https://www.nmlsconsumeraccess.org/" target="_blank" rel="noopener">NMLS Consumer Access</a>
+    <a href="#" onclick="document.getElementById('privacyModal').classList.add('active');return false">Privacy Policy</a>
+    <a href="#" onclick="document.getElementById('dnsModal').classList.add('active');return false">Do Not Sell or Share My Personal Information</a>
+    <a href="#" onclick="document.getElementById('adaModal').classList.add('active');return false">Accessibility</a>
+  </div>
+  © 2026 The Colyer Team. All rights reserved.
 </footer>
+
+<div class="compliance-modal-overlay" id="privacyModal" onclick="if(event.target===this)this.classList.remove('active')"><div class="compliance-modal"><button class="close-btn" onclick="document.getElementById('privacyModal').classList.remove('active')">&times;</button><h2>Privacy Policy</h2><p><strong>Effective Date:</strong> April 1, 2026</p><p>The Colyer Team is committed to protecting your privacy.</p><h3 style="font-size:.95rem;margin:12px 0 6px">Information We Collect</h3><ul><li>Contact and identification information (name, SSN, DOB, address)</li><li>Financial information (income, assets, employment, credit authorization)</li><li>Property information (address, estimated value)</li><li>Usage data (pages visited)</li></ul><h3 style="font-size:.95rem;margin:12px 0 6px">How We Use Your Information</h3><ul><li>To process your mortgage loan application</li><li>To verify your identity and financial qualifications</li><li>To comply with federal and state lending regulations</li></ul><h3 style="font-size:.95rem;margin:12px 0 6px">Your California Privacy Rights (CCPA/CPRA)</h3><p>California residents have the right to know what personal information we collect, request deletion (subject to legal retention requirements), and opt out of sale/sharing. Contact <a href="mailto:mike@thecolyerteam.com">mike@thecolyerteam.com</a> or call <a href="tel:6502888170">(650) 288-8170</a>.</p></div></div>
+
+<div class="compliance-modal-overlay" id="dnsModal" onclick="if(event.target===this)this.classList.remove('active')"><div class="compliance-modal"><button class="close-btn" onclick="document.getElementById('dnsModal').classList.remove('active')">&times;</button><h2>Do Not Sell or Share My Personal Information</h2><p>Under CCPA/CPRA, you have the right to opt out of the sale or sharing of your personal information. We do not sell your personal information. To submit a request, email <a href="mailto:mike@thecolyerteam.com">mike@thecolyerteam.com</a> with subject "Do Not Sell or Share."</p></div></div>
+
+<div class="compliance-modal-overlay" id="adaModal" onclick="if(event.target===this)this.classList.remove('active')"><div class="compliance-modal"><button class="close-btn" onclick="document.getElementById('adaModal').classList.remove('active')">&times;</button><h2>Accessibility Statement</h2><p>The Colyer Team is committed to digital accessibility. We aim to conform to WCAG 2.1 Level AA. If you have difficulty using this site, contact us at <a href="mailto:mike@thecolyerteam.com">mike@thecolyerteam.com</a> or <a href="tel:6502888170">(650) 288-8170</a>.</p></div></div>
 
 <script>
 // Turnstile callback
