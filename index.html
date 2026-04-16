@@ -425,7 +425,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 </div>
 
 <!-- Turnstile -->
-<div class="cf-turnstile" data-sitekey="0x4AAAAAACciFKo0RiY3gv0u" data-callback="onTurnstileSuccess" style="margin-top:16px;"></div>
+<div class="cf-turnstile" data-sitekey="0x4AAAAAAC-J09w-tH_XGw8q" data-callback="onTurnstileSuccess" style="margin-top:16px;"></div>
 <input type="hidden" id="cfTurnstileResponse" name="cf_turnstile_response" value="">
 
 <!-- Buttons -->
@@ -994,7 +994,7 @@ btnSubmit.addEventListener('click',async()=>{
         'Content-Type':'application/json',
         'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdWN0dXFsbXlrZWVtdGNhc2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3ODY5NjMsImV4cCI6MjA3NTM2Mjk2M30.Kyjei2lczrVkFJkOzI8ViLEc-qiOBPrv5TtT6G33MHU',
         'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdWN0dXFsbXlrZWVtdGNhc2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3ODY5NjMsImV4cCI6MjA3NTM2Mjk2M30.Kyjei2lczrVkFJkOzI8ViLEc-qiOBPrv5TtT6G33MHU',
-        'Prefer':'return=representation'
+        'Prefer':'return=minimal'
       },
       body:JSON.stringify((function(){
         // Gather race/ethnicity checkboxes
@@ -1014,8 +1014,8 @@ btnSubmit.addEventListener('click',async()=>{
         const isPurch = data.loanPurpose === 'Purchase';
         return {
           loan_purpose:data.loanPurpose||'',property_type:data.propertyType||'',
-          property_address:data.propAddress||(isPurch?'TBD':''),property_city:data.propCity||(isPurch?'TBD':''),
-          property_state:data.propState||(isPurch?'CA':''),property_zip:data.propZip||(isPurch?'00000':''),
+          property_address:data.propAddress||null,property_city:data.propCity||null,
+          property_state:data.propState||null,property_zip:data.propZip||null,
           property_county:data.propCounty||'',
           estimated_value:parseCurrency(data.propValue),intended_use:data.propUse||'',
           first_name:data.firstName||'',last_name:data.lastName||'',email:data.email||'',

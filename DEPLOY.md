@@ -15,8 +15,10 @@
 ## Quick Deploy
 
 ```bash
-# Set token (or export in .bashrc)
-export NETLIFY_AUTH_TOKEN=nfp_w3y4AJwqDi6Re8rKeGdQSE7uAny8JPy9b94a
+# Token must be set in your shell env — do NOT commit it.
+# Add to ~/.bashrc (or ~/.zshrc):
+#   export NETLIFY_AUTH_TOKEN=<your-personal-access-token>
+# Create a token at: https://app.netlify.com/user/applications#personal-access-tokens
 
 # Deploy to staging
 ./deploy.sh staging
