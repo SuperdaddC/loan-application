@@ -6,8 +6,7 @@
 <title>Apply Online — The Colyer Team</title>
 <meta name="description" content="Start your home loan application with The Colyer Team. Fast, secure, and easy online application.">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/inter-local.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--red:#CF202B;--red-dark:#a8191f;--red-light:#fef2f2;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);--shadow-md:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);--shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);--radius:8px;--radius-lg:12px}
@@ -192,9 +191,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <label class="option-card"><input type="radio" name="propertyType" value="Multi-Unit"><div class="icon">🏗️</div><div class="label">Multi-Unit</div></label>
   </div>
   <div class="form-row">
-    <div class="form-group" id="loanAmountGroup"><label>Loan Amount Requested <span class="req">*</span></label><input type="text" name="loanAmount" placeholder="$" autocomplete="off" inputmode="numeric"><span class="error-msg">Required</span></div>
-    <div class="form-group" id="purchasePriceGroup" style="display:none"><label>Estimated Purchase Price <span class="req">*</span></label><input type="text" name="purchasePrice" id="purchasePriceInput" placeholder="$" autocomplete="off" inputmode="numeric"><span class="error-msg">Required</span></div>
-    <div class="form-group"><label>Estimated Credit Score <span class="req">*</span></label><select name="estimatedCreditScore"><option value="">Select…</option><option>760+</option><option>740-759</option><option>720-739</option><option>700-719</option><option>680-699</option><option>660-679</option><option>640-659</option><option>620-639</option><option>Below 620</option></select><span class="error-msg">Required</span></div>
+    <div class="form-group" id="loanAmountGroup"><label>Loan Amount Requested <span class="req">*</span></label><input type="text" name="loanAmount" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-loanAmount"><span class="error-msg" id="err-loanAmount" role="alert">Required</span></div>
+    <div class="form-group" id="purchasePriceGroup" style="display:none"><label>Estimated Purchase Price <span class="req">*</span></label><input type="text" name="purchasePrice" id="purchasePriceInput" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-purchasePrice"><span class="error-msg" id="err-purchasePrice" role="alert">Required</span></div>
+    <div class="form-group"><label>Estimated Credit Score <span class="req">*</span></label><select name="estimatedCreditScore" aria-describedby="err-estimatedCreditScore"><option value="">Select…</option><option>760+</option><option>740-759</option><option>720-739</option><option>700-719</option><option>680-699</option><option>660-679</option><option>640-659</option><option>620-639</option><option>Below 620</option></select><span class="error-msg" id="err-estimatedCreditScore" role="alert">Required</span></div>
   </div>
   <div class="form-row" id="downPaymentRow" style="display:none">
     <div class="form-group"><label>Down Payment Amount</label><input type="text" name="downPayment" id="downPaymentInput" placeholder="$" autocomplete="off" inputmode="numeric"></div>
@@ -211,15 +210,15 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 <!-- Step 2: Property Info -->
 <div class="step" data-step="2">
-  <div class="form-row single"><div class="form-group"><label>Property Address <span class="req">*</span></label><input type="text" name="propAddress" data-min="8" autocomplete="off"><span class="error-msg">Please enter a valid address (min 8 characters)</span></div></div>
+  <div class="form-row single"><div class="form-group"><label>Property Address <span class="req">*</span></label><input type="text" name="propAddress" data-min="8" autocomplete="street-address" aria-describedby="err-propAddress"><span class="error-msg" id="err-propAddress" role="alert">Please enter a valid address (min 8 characters)</span></div></div>
   <div class="form-row triple">
-    <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="propCity" data-min="2" autocomplete="off"><span class="error-msg">Required</span></div>
-    <div class="form-group"><label>State <span class="req">*</span></label><select name="propState"><option value="">Select…</option></select><span class="error-msg">Required</span></div>
-    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="propZip" maxlength="5" pattern="\d{5}" autocomplete="off"><span class="error-msg">5-digit ZIP</span></div>
+    <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="propCity" data-min="2" autocomplete="address-level2" aria-describedby="err-propCity"><span class="error-msg" id="err-propCity" role="alert">Required</span></div>
+    <div class="form-group"><label>State <span class="req">*</span></label><select name="propState" aria-describedby="err-propState"><option value="">Select…</option></select><span class="error-msg" id="err-propState" role="alert">Required</span></div>
+    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="propZip" maxlength="5" pattern="\d{5}" autocomplete="postal-code" aria-describedby="err-propZip"><span class="error-msg" id="err-propZip" role="alert">5-digit ZIP</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Estimated Value <span class="req">*</span></label><input type="text" name="propValue" placeholder="$" autocomplete="off" inputmode="numeric"><span class="error-msg">Required</span></div>
-    <div class="form-group"><label>Intended Use <span class="req">*</span></label><select name="propUse"><option value="">Select…</option><option>Primary Residence</option><option>Secondary Home</option><option>Investment Property</option></select><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>Estimated Value <span class="req">*</span></label><input type="text" name="propValue" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-propValue"><span class="error-msg" id="err-propValue" role="alert">Required</span></div>
+    <div class="form-group"><label>Intended Use <span class="req">*</span></label><select name="propUse" aria-describedby="err-propUse"><option value="">Select…</option><option>Primary Residence</option><option>Secondary Home</option><option>Investment Property</option></select><span class="error-msg" id="err-propUse" role="alert">Required</span></div>
   </div>
   <div class="form-row single"><div class="form-group"><label>County</label><input type="text" name="propCounty" autocomplete="off"></div></div>
 </div>
@@ -227,20 +226,20 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <!-- Step 3: Borrower Info -->
 <div class="step" data-step="3">
   <div class="form-row">
-    <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" name="firstName" data-min="2" autocomplete="off"><span class="error-msg">Min 2 characters</span></div>
-    <div class="form-group"><label>Last Name <span class="req">*</span></label><input type="text" name="lastName" data-min="2" autocomplete="off"><span class="error-msg">Min 2 characters</span></div>
+    <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" name="firstName" data-min="2" autocomplete="given-name" aria-describedby="err-firstName"><span class="error-msg" id="err-firstName" role="alert">Min 2 characters</span></div>
+    <div class="form-group"><label>Last Name <span class="req">*</span></label><input type="text" name="lastName" data-min="2" autocomplete="family-name" aria-describedby="err-lastName"><span class="error-msg" id="err-lastName" role="alert">Min 2 characters</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Email <span class="req">*</span></label><input type="email" name="email" autocomplete="off"><span class="error-msg">Valid email required</span></div>
-    <div class="form-group"><label>Phone <span class="req">*</span></label><input type="tel" name="phone" placeholder="(555) 555-5555" inputmode="numeric" autocomplete="off"><span class="error-msg">10-11 digits required</span></div>
+    <div class="form-group"><label>Email <span class="req">*</span></label><input type="email" name="email" autocomplete="email" aria-describedby="err-email"><span class="error-msg" id="err-email" role="alert">Valid email required</span></div>
+    <div class="form-group"><label>Phone <span class="req">*</span></label><input type="tel" name="phone" placeholder="(555) 555-5555" inputmode="numeric" autocomplete="tel" aria-describedby="err-phone"><span class="error-msg" id="err-phone" role="alert">10-11 digits required</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Date of Birth <span class="req">*</span></label><input type="text" name="dob" placeholder="MM/DD/YYYY" inputmode="numeric" maxlength="10" autocomplete="off"><span class="error-msg">Enter as MM/DD/YYYY</span></div>
-    <div class="form-group"><label>Marital Status <span class="req">*</span></label><select name="maritalStatus"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>Date of Birth <span class="req">*</span></label><input type="text" name="dob" placeholder="MM/DD/YYYY" inputmode="numeric" maxlength="10" autocomplete="off" aria-describedby="err-dob"><span class="error-msg" id="err-dob" role="alert">Enter as MM/DD/YYYY</span></div>
+    <div class="form-group"><label>Marital Status <span class="req">*</span></label><select name="maritalStatus" aria-describedby="err-maritalStatus"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select><span class="error-msg" id="err-maritalStatus" role="alert">Required</span></div>
   </div>
   <div class="form-row">
     <div class="form-group"><label>Number of Dependents</label><input type="number" name="dependents" min="0" max="20" value="0" autocomplete="off"></div>
-    <div class="form-group"><label>Social Security Number <span class="req">*</span></label><input type="password" name="ssn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric"><span class="error-msg">9 digits required</span></div>
+    <div class="form-group"><label>Social Security Number <span class="req">*</span></label><input type="password" name="ssn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric" aria-describedby="err-ssn"><span class="error-msg" id="err-ssn" role="alert">9 digits required</span></div>
   </div>
 
   <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Race/Ethnicity (HMDA)</p>
@@ -288,15 +287,15 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 <!-- Step 4: Current Address -->
 <div class="step" data-step="4">
-  <div class="form-row single"><div class="form-group"><label>Street Address <span class="req">*</span></label><input type="text" name="curStreet" data-min="8" autocomplete="off"><span class="error-msg">Min 8 characters</span></div></div>
+  <div class="form-row single"><div class="form-group"><label>Street Address <span class="req">*</span></label><input type="text" name="curStreet" data-min="8" autocomplete="street-address" aria-describedby="err-curStreet"><span class="error-msg" id="err-curStreet" role="alert">Min 8 characters</span></div></div>
   <div class="form-row triple">
-    <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="curCity" data-min="2" autocomplete="off"><span class="error-msg">Required</span></div>
-    <div class="form-group"><label>State <span class="req">*</span></label><select name="curState"><option value="">Select…</option></select><span class="error-msg">Required</span></div>
-    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="curZip" maxlength="5" pattern="\d{5}" autocomplete="off"><span class="error-msg">5-digit ZIP</span></div>
+    <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="curCity" data-min="2" autocomplete="address-level2" aria-describedby="err-curCity"><span class="error-msg" id="err-curCity" role="alert">Required</span></div>
+    <div class="form-group"><label>State <span class="req">*</span></label><select name="curState" aria-describedby="err-curState"><option value="">Select…</option></select><span class="error-msg" id="err-curState" role="alert">Required</span></div>
+    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="curZip" maxlength="5" pattern="\d{5}" autocomplete="postal-code" aria-describedby="err-curZip"><span class="error-msg" id="err-curZip" role="alert">5-digit ZIP</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Own or Rent <span class="req">*</span></label><select name="curOwnRent"><option value="">Select…</option><option>Own</option><option>Rent</option><option>Living Rent-Free</option></select><span class="error-msg">Required</span></div>
-    <div class="form-group"><label>Years at Address <span class="req">*</span></label><input type="number" name="curYears" min="0" max="99" autocomplete="off"><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>Own or Rent <span class="req">*</span></label><select name="curOwnRent" aria-describedby="err-curOwnRent"><option value="">Select…</option><option>Own</option><option>Rent</option><option>Living Rent-Free</option></select><span class="error-msg" id="err-curOwnRent" role="alert">Required</span></div>
+    <div class="form-group"><label>Years at Address <span class="req">*</span></label><input type="number" name="curYears" min="0" max="99" autocomplete="off" aria-describedby="err-curYears"><span class="error-msg" id="err-curYears" role="alert">Required</span></div>
   </div>
   <div class="form-row single"><div class="form-group"><label>Monthly Housing Expense (rent/mortgage payment)</label><input type="text" name="monthlyHousingExpense" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div></div>
   <div id="prevAddrBlock" style="display:none">
@@ -313,12 +312,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <!-- Step 5: Employment -->
 <div class="step" data-step="5">
   <div class="form-row">
-    <div class="form-group"><label>Employer Name <span class="req">*</span></label><input type="text" name="empName" data-min="2" autocomplete="off"><span class="error-msg">Required</span></div>
-    <div class="form-group"><label>Job Title <span class="req">*</span></label><input type="text" name="empTitle" data-min="2" autocomplete="off"><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>Employer Name <span class="req">*</span></label><input type="text" name="empName" data-min="2" autocomplete="off" aria-describedby="err-empName"><span class="error-msg" id="err-empName" role="alert">Required</span></div>
+    <div class="form-group"><label>Job Title <span class="req">*</span></label><input type="text" name="empTitle" data-min="2" autocomplete="off" aria-describedby="err-empTitle"><span class="error-msg" id="err-empTitle" role="alert">Required</span></div>
   </div>
   <div class="form-row">
     <div class="form-group"><label>Employer Phone</label><input type="tel" name="empPhone" inputmode="numeric" autocomplete="off"></div>
-    <div class="form-group"><label>Start Date <span class="req">*</span></label><input type="text" name="empStartDate" placeholder="MM/YYYY" inputmode="numeric" maxlength="7" autocomplete="off"><span class="error-msg">Enter as MM/YYYY</span></div>
+    <div class="form-group"><label>Start Date <span class="req">*</span></label><input type="text" name="empStartDate" placeholder="MM/YYYY" inputmode="numeric" maxlength="7" autocomplete="off" aria-describedby="err-empStartDate"><span class="error-msg" id="err-empStartDate" role="alert">Enter as MM/YYYY</span></div>
   </div>
   <div class="form-row single">
     <div class="form-group"><label style="color:var(--gray-500);font-style:italic" id="empYearsCalc"></label>
@@ -332,7 +331,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
   <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Monthly Income Breakdown <span class="req">*</span></p>
   <div class="form-row">
-    <div class="form-group"><label>Base / Salary <span class="req">*</span></label><input type="text" name="baseIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"><span class="error-msg">Required</span></div>
+    <div class="form-group"><label>Base / Salary <span class="req">*</span></label><input type="text" name="baseIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric" aria-describedby="err-baseIncome"><span class="error-msg" id="err-baseIncome" role="alert">Required</span></div>
     <div class="form-group"><label>Overtime</label><input type="text" name="overtimeIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
   </div>
   <div class="form-row">
@@ -987,6 +986,9 @@ btnSubmit.addEventListener('click',async()=>{
   btnSubmit.disabled=true;
   btnSubmit.innerHTML='<span class="spinner"></span>Submitting…';
 
+  // Generate ID client-side so we have it for file uploads without needing return=representation
+  const _clientLoanId = crypto.randomUUID();
+
   try{
     const resp = await fetch('https://apuctuqlmykeemtcasji.supabase.co/rest/v1/loan_applications',{
       method:'POST',
@@ -1013,6 +1015,7 @@ btnSubmit.addEventListener('click',async()=>{
         const parseCurrency = v=>{const n=parseFloat((v||'').replace(/[^0-9.]/g,''));return isNaN(n)?null:n;};
         const isPurch = data.loanPurpose === 'Purchase';
         return {
+          id:_clientLoanId,
           loan_purpose:data.loanPurpose||'',property_type:data.propertyType||'',
           property_address:data.propAddress||null,property_city:data.propCity||null,
           property_state:data.propState||null,property_zip:data.propZip||null,
@@ -1091,19 +1094,18 @@ btnSubmit.addEventListener('click',async()=>{
         };
       })())
     });
+    delete data.ssn; delete data.coBorrSsn;
     if(!resp.ok){
       const errBody = await resp.text();
       console.error('Submit failed:',resp.status,errBody);
       let userMsg = 'Something went wrong submitting your application. Please try again or call us at (760) 413-2724.';
-      try{const j=JSON.parse(errBody);if(j.message)userMsg=j.message;}catch(ignored){}
       alert(userMsg);
       btnSubmit.disabled=false;
       btnSubmit.innerHTML='Submit Application';
       return;
     }
-    // Get loan application ID for file uploads
-    let loanAppId = null;
-    try{const rows=await resp.json();if(Array.isArray(rows)&&rows.length)loanAppId=rows[0].id;}catch(ignored){}
+    // Use the client-generated UUID for file uploads
+    const loanAppId = _clientLoanId;
 
     // Upload documents if any
     if(uploadedFiles.length && loanAppId){

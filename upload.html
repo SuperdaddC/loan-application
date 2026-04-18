@@ -52,6 +52,12 @@ const headers = {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_K
 const app = document.getElementById('app');
 const token = new URLSearchParams(location.search).get('token');
 
+// Strip token from URL to prevent leaking via Referer header, browser history, etc.
+if (token && window.history.replaceState) {
+  const cleanUrl = location.pathname;
+  window.history.replaceState({}, document.title, cleanUrl);
+}
+
 if (!token) { app.innerHTML = '<div class="error">Invalid link. No access token provided.</div>'; }
 else { init(); }
 
@@ -84,6 +90,19 @@ async function init() {
 const CAT_ORDER = ['income','assets','property','identity','questions','other'];
 const CAT_LABELS = {income:'Income',assets:'Assets',property:'Property',identity:'Identity',questions:'Questions',other:'Other'};
 
+// Escape HTML to prevent XSS from database-sourced values
+function esc(str) {
+  if (!str) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// Allowed file types and size limits for uploads
+const ALLOWED_TYPES = ['application/pdf','image/jpeg','image/png','image/gif','image/webp'];
+const ALLOWED_EXTS = ['.pdf','.jpg','.jpeg','.png','.gif','.webp'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
+
 function render(nl, borrower, docsByIdx) {
   const items = nl.items || [];
   const cats = {};
@@ -93,13 +112,13 @@ function render(nl, borrower, docsByIdx) {
   });
   const received = items.filter(i => i.received).length;
   
-  let html = `<p class="greeting">Hi ${borrower.first_name || 'there'},</p>
+  let html = `<p class="greeting">Hi ${esc(borrower.first_name) || 'there'},</p>
     <p class="subtitle">Here's your document checklist. Upload each item below. (${received}/${items.length} complete)</p>`;
   
   const orderedCats = CAT_ORDER.filter(c => cats[c]).concat(Object.keys(cats).filter(c => !CAT_ORDER.includes(c)));
   
   for (const cat of orderedCats) {
-    html += `<div class="category"><div class="cat-label">${CAT_LABELS[cat] || cat}</div>`;
+    html += `<div class="category"><div class="cat-label">${esc(CAT_LABELS[cat] || cat)}</div>`;
     for (const item of cats[cat]) {
       const done = item.received;
       const uploads = docsByIdx[item._idx] || [];
@@ -108,9 +127,9 @@ function render(nl, borrower, docsByIdx) {
           ${done ? '<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>' : ''}
         </div>
         <div class="item-content">
-          <div class="item-label">${item.label}</div>
-          ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
-          ${uploads.length ? `<div class="item-files">${uploads.map(u => `<span class="file-chip">📎 ${u.file_name}</span>`).join('')}</div>` : ''}
+          <div class="item-label">${esc(item.label)}</div>
+          ${item.description ? `<div class="item-desc">${esc(item.description)}</div>` : ''}
+          ${uploads.length ? `<div class="item-files">${uploads.map(u => `<span class="file-chip">📎 ${esc(u.file_name)}</span>`).join('')}</div>` : ''}
         </div>
         <button class="upload-btn" onclick="pickFile(${item._idx})" ${done ? '' : ''}>Upload</button>
         <input type="file" id="file-${item._idx}" onchange="uploadFile(${item._idx}, '${nl.id}')" multiple>
@@ -127,6 +146,21 @@ async function uploadFile(idx, needsListId) {
   const input = document.getElementById('file-' + idx);
   const files = input.files;
   if (!files.length) return;
+
+  // Validate file types and sizes
+  for (const file of files) {
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!ALLOWED_EXTS.includes(ext) && !ALLOWED_TYPES.includes(file.type)) {
+      alert('File type not allowed: ' + file.name + '. Accepted: PDF, JPG, PNG, GIF, WebP.');
+      input.value = '';
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      alert('File too large: ' + file.name + '. Maximum size is 10MB per file.');
+      input.value = '';
+      return;
+    }
+  }
   const btn = document.querySelector(`#item-${idx} .upload-btn`);
   btn.textContent = 'Uploading...';
   btn.classList.add('uploading');
