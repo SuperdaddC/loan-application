@@ -138,7 +138,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   .form-body{padding:20px 16px 24px}
   .progress-wrap{padding:20px 16px 0}
   .header{padding:12px 16px}
-  .btn{padding:10px 20px;font-size:.85rem}
+  .btn{padding:12px 20px;font-size:.85rem;min-height:44px}
+  .check-row input[type=checkbox]{width:22px;height:22px}
 }
 
 /* Spinner */
@@ -151,6 +152,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .group-error{display:none;font-size:.75rem;color:var(--red);margin-top:-8px;margin-bottom:16px}
 .group-error.show{display:block}
 .option-card:focus-within{outline:2px solid var(--red);outline-offset:2px}
+.step:focus{outline:none}
 </style>
 </head>
 <body>
@@ -227,7 +229,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div class="form-row triple">
     <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="propCity" data-min="2" autocomplete="address-level2" aria-describedby="err-propCity"><span class="error-msg" id="err-propCity" role="alert">Required</span></div>
     <div class="form-group"><label>State <span class="req">*</span></label><select name="propState" aria-describedby="err-propState"><option value="">Select…</option></select><span class="error-msg" id="err-propState" role="alert">Required</span></div>
-    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="propZip" maxlength="5" pattern="\d{5}" autocomplete="postal-code" aria-describedby="err-propZip"><span class="error-msg" id="err-propZip" role="alert">5-digit ZIP</span></div>
+    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="propZip" maxlength="5" pattern="\d{5}" inputmode="numeric" autocomplete="postal-code" aria-describedby="err-propZip"><span class="error-msg" id="err-propZip" role="alert">5-digit ZIP</span></div>
   </div>
   <div class="form-row">
     <div class="form-group"><label>Estimated Value <span class="req">*</span></label><input type="text" name="propValue" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-propValue"><span class="error-msg" id="err-propValue" role="alert">Required</span></div>
@@ -251,7 +253,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="form-group"><label>Marital Status <span class="req">*</span></label><select name="maritalStatus" aria-describedby="err-maritalStatus"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select><span class="error-msg" id="err-maritalStatus" role="alert">Required</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Number of Dependents</label><input type="number" name="dependents" min="0" max="20" value="0" autocomplete="off"></div>
+    <div class="form-group"><label>Number of Dependents</label><input type="number" name="dependents" min="0" max="20" value="0" inputmode="numeric" autocomplete="off"></div>
     <div class="form-group"><label>Social Security Number <span class="req">*</span></label><input type="password" name="ssn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric" aria-describedby="err-ssn"><span class="error-msg" id="err-ssn" role="alert">9 digits required</span></div>
   </div>
 
@@ -312,11 +314,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div class="form-row triple">
     <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="curCity" data-min="2" autocomplete="address-level2" aria-describedby="err-curCity"><span class="error-msg" id="err-curCity" role="alert">Required</span></div>
     <div class="form-group"><label>State <span class="req">*</span></label><select name="curState" aria-describedby="err-curState"><option value="">Select…</option></select><span class="error-msg" id="err-curState" role="alert">Required</span></div>
-    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="curZip" maxlength="5" pattern="\d{5}" autocomplete="postal-code" aria-describedby="err-curZip"><span class="error-msg" id="err-curZip" role="alert">5-digit ZIP</span></div>
+    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="curZip" maxlength="5" pattern="\d{5}" inputmode="numeric" autocomplete="postal-code" aria-describedby="err-curZip"><span class="error-msg" id="err-curZip" role="alert">5-digit ZIP</span></div>
   </div>
   <div class="form-row">
     <div class="form-group"><label>Own or Rent <span class="req">*</span></label><select name="curOwnRent" aria-describedby="err-curOwnRent"><option value="">Select…</option><option>Own</option><option>Rent</option><option>Living Rent-Free</option></select><span class="error-msg" id="err-curOwnRent" role="alert">Required</span></div>
-    <div class="form-group"><label>Years at Address <span class="req">*</span></label><input type="number" name="curYears" min="0" max="99" autocomplete="off" aria-describedby="err-curYears"><span class="error-msg" id="err-curYears" role="alert">Required</span></div>
+    <div class="form-group"><label>Years at Address <span class="req">*</span></label><input type="number" name="curYears" min="0" max="99" inputmode="numeric" autocomplete="off" aria-describedby="err-curYears"><span class="error-msg" id="err-curYears" role="alert">Required</span></div>
   </div>
   <div class="form-row single"><div class="form-group"><label>Monthly Housing Expense (rent/mortgage payment)</label><input type="text" name="monthlyHousingExpense" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div></div>
   <div id="prevAddrBlock" style="display:none">
@@ -325,7 +327,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="form-row triple">
       <div class="form-group"><label>City <span class="req prev-req">*</span></label><input type="text" name="prevCity" autocomplete="off" aria-describedby="err-prevCity"><span class="error-msg" id="err-prevCity" role="alert">Required</span></div>
       <div class="form-group"><label>State <span class="req prev-req">*</span></label><select name="prevState" aria-describedby="err-prevState"><option value="">Select…</option></select><span class="error-msg" id="err-prevState" role="alert">Required</span></div>
-      <div class="form-group"><label>ZIP <span class="req prev-req">*</span></label><input type="text" name="prevZip" maxlength="5" autocomplete="off" aria-describedby="err-prevZip"><span class="error-msg" id="err-prevZip" role="alert">5-digit ZIP</span></div>
+      <div class="form-group"><label>ZIP <span class="req prev-req">*</span></label><input type="text" name="prevZip" maxlength="5" inputmode="numeric" autocomplete="off" aria-describedby="err-prevZip"><span class="error-msg" id="err-prevZip" role="alert">5-digit ZIP</span></div>
     </div>
   </div>
 </div>
@@ -589,9 +591,11 @@ const btnNext = document.getElementById('btnNext');
 const btnBack = document.getElementById('btnBack');
 const btnSubmit = document.getElementById('btnSubmit');
 
+let _firstPaint = true;
 function updateUI(){
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
-  document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+  const activeStep = document.querySelector(`.step[data-step="${currentStep}"]`);
+  activeStep.classList.add('active');
   document.getElementById('stepTitle').textContent = stepData[currentStep-1].title;
   document.getElementById('stepSubtitle').textContent = stepData[currentStep-1].sub;
   document.getElementById('progressFill').style.width = (currentStep/totalSteps*100)+'%';
@@ -610,6 +614,15 @@ function updateUI(){
   }
   if(currentStep===9) buildReview();
   window.scrollTo({top:0,behavior:'smooth'});
+  // Tab order: without this, focus stays on Continue, which sits AFTER the step in
+  // the DOM, so the next Tab escapes into the footer instead of entering the new
+  // step. Focus the step container rather than its first input: Tab then lands on
+  // the first field, and a mobile keyboard does not pop up unbidden.
+  if(!_firstPaint){
+    activeStep.setAttribute('tabindex','-1');
+    try { activeStep.focus({preventScroll:true}); } catch(_) {}
+  }
+  _firstPaint = false;
 }
 
 // Option cards
