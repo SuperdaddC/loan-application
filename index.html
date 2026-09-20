@@ -203,20 +203,20 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   </div>
   <span class="group-error" id="err-propertyType" role="alert">Please select a property type</span>
   <div class="form-row">
-    <div class="form-group" id="loanAmountGroup"><label>Loan Amount Requested <span class="req">*</span></label><input type="text" name="loanAmount" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-loanAmount"><span class="error-msg" id="err-loanAmount" role="alert">Required</span></div>
-    <div class="form-group" id="purchasePriceGroup" style="display:none"><label>Estimated Purchase Price <span class="req">*</span></label><input type="text" name="purchasePrice" id="purchasePriceInput" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-purchasePrice"><span class="error-msg" id="err-purchasePrice" role="alert">Required</span></div>
-    <div class="form-group"><label>Estimated Credit Score <span class="req">*</span></label><select name="estimatedCreditScore" aria-describedby="err-estimatedCreditScore"><option value="">Select…</option><option>760+</option><option>740-759</option><option>720-739</option><option>700-719</option><option>680-699</option><option>660-679</option><option>640-659</option><option>620-639</option><option>Below 620</option></select><span class="error-msg" id="err-estimatedCreditScore" role="alert">Required</span></div>
+    <div class="form-group" id="loanAmountGroup"><label for="f-loanAmount">Loan Amount Requested <span class="req">*</span></label><input id="f-loanAmount" type="text" name="loanAmount" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-loanAmount"><span class="error-msg" id="err-loanAmount" role="alert">Required</span></div>
+    <div class="form-group" id="purchasePriceGroup" style="display:none"><label for="purchasePriceInput">Estimated Purchase Price <span class="req">*</span></label><input type="text" name="purchasePrice" id="purchasePriceInput" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-purchasePrice"><span class="error-msg" id="err-purchasePrice" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-estimatedCreditScore">Estimated Credit Score <span class="req">*</span></label><select id="f-estimatedCreditScore" name="estimatedCreditScore" aria-describedby="err-estimatedCreditScore"><option value="">Select…</option><option>760+</option><option>740-759</option><option>720-739</option><option>700-719</option><option>680-699</option><option>660-679</option><option>640-659</option><option>620-639</option><option>Below 620</option></select><span class="error-msg" id="err-estimatedCreditScore" role="alert">Required</span></div>
   </div>
   <div class="form-row single" id="cashOutRow" style="display:none">
-    <div class="form-group"><label>Cash Out Amount Requested <span class="req">*</span></label><input type="text" name="cashOutAmount" id="cashOutAmountInput" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-cashOutAmount"><span class="error-msg" id="err-cashOutAmount" role="alert">Required</span></div>
+    <div class="form-group"><label for="cashOutAmountInput">Cash Out Amount Requested <span class="req">*</span></label><input type="text" name="cashOutAmount" id="cashOutAmountInput" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-cashOutAmount"><span class="error-msg" id="err-cashOutAmount" role="alert">Required</span></div>
   </div>
   <div class="form-row" id="downPaymentRow" style="display:none">
-    <div class="form-group"><label>Down Payment Amount</label><input type="text" name="downPayment" id="downPaymentInput" placeholder="$" autocomplete="off" inputmode="numeric"></div>
-    <div class="form-group"><label>Down Payment Source</label><select name="downPaymentSource"><option value="">Select…</option><option>Savings</option><option>Gift</option><option>Sale of Property</option><option>Other</option></select></div>
+    <div class="form-group"><label for="downPaymentInput">Down Payment Amount</label><input type="text" name="downPayment" id="downPaymentInput" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-downPaymentSource">Down Payment Source</label><select id="f-downPaymentSource" name="downPaymentSource"><option value="">Select…</option><option>Savings</option><option>Gift</option><option>Sale of Property</option><option>Other</option></select></div>
   </div>
   <div class="form-row single" id="calcLoanAmountRow" style="display:none">
     <div class="form-group">
-      <label>Loan Amount <span style="color:var(--gray-400);font-weight:400;font-style:italic;font-size:.75rem">(calculated: Purchase Price − Down Payment)</span></label>
+      <label for="calcLoanAmountDisplay">Loan Amount <span style="color:var(--gray-400);font-weight:400;font-style:italic;font-size:.75rem">(calculated: Purchase Price − Down Payment)</span></label>
       <input type="text" id="calcLoanAmountDisplay" readonly placeholder="—" style="background:var(--gray-50);color:var(--gray-700);cursor:default;font-weight:600;border-color:var(--gray-200)">
       <span id="downPaymentErrorMsg" style="font-size:.75rem;color:var(--red);margin-top:4px;display:none">Down payment cannot exceed purchase price</span>
     </div>
@@ -225,36 +225,36 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 <!-- Step 2: Property Info -->
 <div class="step" data-step="2">
-  <div class="form-row single"><div class="form-group"><label>Property Address <span class="req">*</span></label><input type="text" name="propAddress" data-min="8" autocomplete="street-address" aria-describedby="err-propAddress"><span class="error-msg" id="err-propAddress" role="alert">Please enter a valid address (min 8 characters)</span></div></div>
+  <div class="form-row single"><div class="form-group"><label for="f-propAddress">Property Address <span class="req">*</span></label><input id="f-propAddress" type="text" name="propAddress" data-min="8" autocomplete="street-address" aria-describedby="err-propAddress"><span class="error-msg" id="err-propAddress" role="alert">Please enter a valid address (min 8 characters)</span></div></div>
   <div class="form-row triple">
-    <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="propCity" data-min="2" autocomplete="address-level2" aria-describedby="err-propCity"><span class="error-msg" id="err-propCity" role="alert">Required</span></div>
-    <div class="form-group"><label>State <span class="req">*</span></label><select name="propState" aria-describedby="err-propState"><option value="">Select…</option></select><span class="error-msg" id="err-propState" role="alert">Required</span></div>
-    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="propZip" maxlength="5" pattern="\d{5}" inputmode="numeric" autocomplete="postal-code" aria-describedby="err-propZip"><span class="error-msg" id="err-propZip" role="alert">5-digit ZIP</span></div>
+    <div class="form-group"><label for="f-propCity">City <span class="req">*</span></label><input id="f-propCity" type="text" name="propCity" data-min="2" autocomplete="address-level2" aria-describedby="err-propCity"><span class="error-msg" id="err-propCity" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-propState">State <span class="req">*</span></label><select id="f-propState" name="propState" aria-describedby="err-propState"><option value="">Select…</option></select><span class="error-msg" id="err-propState" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-propZip">ZIP <span class="req">*</span></label><input id="f-propZip" type="text" name="propZip" maxlength="5" pattern="\d{5}" inputmode="numeric" autocomplete="postal-code" aria-describedby="err-propZip"><span class="error-msg" id="err-propZip" role="alert">5-digit ZIP</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Estimated Value <span class="req">*</span></label><input type="text" name="propValue" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-propValue"><span class="error-msg" id="err-propValue" role="alert">Required</span></div>
-    <div class="form-group"><label>Intended Use <span class="req">*</span></label><select name="propUse" aria-describedby="err-propUse"><option value="">Select…</option><option>Primary Residence</option><option>Secondary Home</option><option>Investment Property</option></select><span class="error-msg" id="err-propUse" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-propValue">Estimated Value <span class="req">*</span></label><input id="f-propValue" type="text" name="propValue" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-propValue"><span class="error-msg" id="err-propValue" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-propUse">Intended Use <span class="req">*</span></label><select id="f-propUse" name="propUse" aria-describedby="err-propUse"><option value="">Select…</option><option>Primary Residence</option><option>Secondary Home</option><option>Investment Property</option></select><span class="error-msg" id="err-propUse" role="alert">Required</span></div>
   </div>
-  <div class="form-row single"><div class="form-group"><label>County</label><input type="text" name="propCounty" autocomplete="off"></div></div>
+  <div class="form-row single"><div class="form-group"><label for="f-propCounty">County</label><input id="f-propCounty" type="text" name="propCounty" autocomplete="off"></div></div>
 </div>
 
 <!-- Step 3: Borrower Info -->
 <div class="step" data-step="3">
   <div class="form-row">
-    <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" name="firstName" data-min="2" autocomplete="given-name" aria-describedby="err-firstName"><span class="error-msg" id="err-firstName" role="alert">Min 2 characters</span></div>
-    <div class="form-group"><label>Last Name <span class="req">*</span></label><input type="text" name="lastName" data-min="2" autocomplete="family-name" aria-describedby="err-lastName"><span class="error-msg" id="err-lastName" role="alert">Min 2 characters</span></div>
+    <div class="form-group"><label for="f-firstName">First Name <span class="req">*</span></label><input id="f-firstName" type="text" name="firstName" data-min="2" autocomplete="given-name" aria-describedby="err-firstName"><span class="error-msg" id="err-firstName" role="alert">Min 2 characters</span></div>
+    <div class="form-group"><label for="f-lastName">Last Name <span class="req">*</span></label><input id="f-lastName" type="text" name="lastName" data-min="2" autocomplete="family-name" aria-describedby="err-lastName"><span class="error-msg" id="err-lastName" role="alert">Min 2 characters</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Email <span class="req">*</span></label><input type="email" name="email" autocomplete="email" aria-describedby="err-email"><span class="error-msg" id="err-email" role="alert">Valid email required</span></div>
-    <div class="form-group"><label>Phone <span class="req">*</span></label><input type="tel" name="phone" placeholder="(555) 555-5555" inputmode="numeric" autocomplete="tel" aria-describedby="err-phone"><span class="error-msg" id="err-phone" role="alert">10-11 digits required</span></div>
+    <div class="form-group"><label for="f-email">Email <span class="req">*</span></label><input id="f-email" type="email" name="email" autocomplete="email" aria-describedby="err-email"><span class="error-msg" id="err-email" role="alert">Valid email required</span></div>
+    <div class="form-group"><label for="f-phone">Phone <span class="req">*</span></label><input id="f-phone" type="tel" name="phone" placeholder="(555) 555-5555" inputmode="numeric" autocomplete="tel" aria-describedby="err-phone"><span class="error-msg" id="err-phone" role="alert">10-11 digits required</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Date of Birth <span class="req">*</span></label><input type="text" name="dob" placeholder="MM/DD/YYYY" inputmode="numeric" maxlength="10" autocomplete="off" aria-describedby="err-dob"><span class="error-msg" id="err-dob" role="alert">Enter as MM/DD/YYYY</span></div>
-    <div class="form-group"><label>Marital Status <span class="req">*</span></label><select name="maritalStatus" aria-describedby="err-maritalStatus"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select><span class="error-msg" id="err-maritalStatus" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-dob">Date of Birth <span class="req">*</span></label><input id="f-dob" type="text" name="dob" placeholder="MM/DD/YYYY" inputmode="numeric" maxlength="10" autocomplete="off" aria-describedby="err-dob"><span class="error-msg" id="err-dob" role="alert">Enter as MM/DD/YYYY</span></div>
+    <div class="form-group"><label for="f-maritalStatus">Marital Status <span class="req">*</span></label><select id="f-maritalStatus" name="maritalStatus" aria-describedby="err-maritalStatus"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select><span class="error-msg" id="err-maritalStatus" role="alert">Required</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Number of Dependents</label><input type="number" name="dependents" min="0" max="20" value="0" inputmode="numeric" autocomplete="off"></div>
-    <div class="form-group"><label>Social Security Number <span class="req">*</span></label><input type="password" name="ssn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric" aria-describedby="err-ssn"><span class="error-msg" id="err-ssn" role="alert">9 digits required</span></div>
+    <div class="form-group"><label for="f-dependents">Number of Dependents</label><input id="f-dependents" type="number" name="dependents" min="0" max="20" value="0" inputmode="numeric" autocomplete="off"></div>
+    <div class="form-group"><label for="f-ssn">Social Security Number <span class="req">*</span></label><input id="f-ssn" type="password" name="ssn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric" aria-describedby="err-ssn"><span class="error-msg" id="err-ssn" role="alert">9 digits required</span></div>
   </div>
 
   <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 4px">Demographic Information (HMDA)</p>
@@ -290,19 +290,19 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     </label>
     <div id="coBorrowerBlock" style="display:none;margin-top:12px;padding:16px;border:1px solid var(--gray-200);border-radius:var(--radius-lg);background:var(--gray-50)">
       <div class="form-row">
-        <div class="form-group"><label>Co-Borrower First Name <span class="req cb-req">*</span></label><input type="text" name="coBorrFirstName" autocomplete="off" aria-describedby="err-coBorrFirstName"><span class="error-msg" id="err-coBorrFirstName" role="alert">Required</span></div>
-        <div class="form-group"><label>Co-Borrower Last Name <span class="req cb-req">*</span></label><input type="text" name="coBorrLastName" autocomplete="off" aria-describedby="err-coBorrLastName"><span class="error-msg" id="err-coBorrLastName" role="alert">Required</span></div>
+        <div class="form-group"><label for="f-coBorrFirstName">Co-Borrower First Name <span class="req cb-req">*</span></label><input id="f-coBorrFirstName" type="text" name="coBorrFirstName" autocomplete="off" aria-describedby="err-coBorrFirstName"><span class="error-msg" id="err-coBorrFirstName" role="alert">Required</span></div>
+        <div class="form-group"><label for="f-coBorrLastName">Co-Borrower Last Name <span class="req cb-req">*</span></label><input id="f-coBorrLastName" type="text" name="coBorrLastName" autocomplete="off" aria-describedby="err-coBorrLastName"><span class="error-msg" id="err-coBorrLastName" role="alert">Required</span></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Co-Borrower Email <span class="req cb-req">*</span></label><input type="email" name="coBorrEmail" autocomplete="off" aria-describedby="err-coBorrEmail"><span class="error-msg" id="err-coBorrEmail" role="alert">Valid email required</span></div>
-        <div class="form-group"><label>Co-Borrower Phone</label><input type="tel" name="coBorrPhone" inputmode="numeric" autocomplete="off"></div>
+        <div class="form-group"><label for="f-coBorrEmail">Co-Borrower Email <span class="req cb-req">*</span></label><input id="f-coBorrEmail" type="email" name="coBorrEmail" autocomplete="off" aria-describedby="err-coBorrEmail"><span class="error-msg" id="err-coBorrEmail" role="alert">Valid email required</span></div>
+        <div class="form-group"><label for="f-coBorrPhone">Co-Borrower Phone</label><input id="f-coBorrPhone" type="tel" name="coBorrPhone" inputmode="numeric" autocomplete="off"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Co-Borrower Date of Birth</label><input type="text" name="coBorrDob" placeholder="MM/DD/YYYY" inputmode="numeric" maxlength="10" autocomplete="off"></div>
-        <div class="form-group"><label>Co-Borrower SSN <span class="req cb-req">*</span></label><input type="password" name="coBorrSsn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric" aria-describedby="err-coBorrSsn"><span class="error-msg" id="err-coBorrSsn" role="alert">9 digits required</span></div>
+        <div class="form-group"><label for="f-coBorrDob">Co-Borrower Date of Birth</label><input id="f-coBorrDob" type="text" name="coBorrDob" placeholder="MM/DD/YYYY" inputmode="numeric" maxlength="10" autocomplete="off"></div>
+        <div class="form-group"><label for="f-coBorrSsn">Co-Borrower SSN <span class="req cb-req">*</span></label><input id="f-coBorrSsn" type="password" name="coBorrSsn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric" aria-describedby="err-coBorrSsn"><span class="error-msg" id="err-coBorrSsn" role="alert">9 digits required</span></div>
       </div>
       <div class="form-row single">
-        <div class="form-group"><label>Co-Borrower Marital Status</label><select name="coBorrMarital"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></div>
+        <div class="form-group"><label for="f-coBorrMarital">Co-Borrower Marital Status</label><select id="f-coBorrMarital" name="coBorrMarital"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></div>
       </div>
     </div>
   </div>
@@ -310,24 +310,24 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 <!-- Step 4: Current Address -->
 <div class="step" data-step="4">
-  <div class="form-row single"><div class="form-group"><label>Street Address <span class="req">*</span></label><input type="text" name="curStreet" data-min="8" autocomplete="street-address" aria-describedby="err-curStreet"><span class="error-msg" id="err-curStreet" role="alert">Min 8 characters</span></div></div>
+  <div class="form-row single"><div class="form-group"><label for="f-curStreet">Street Address <span class="req">*</span></label><input id="f-curStreet" type="text" name="curStreet" data-min="8" autocomplete="street-address" aria-describedby="err-curStreet"><span class="error-msg" id="err-curStreet" role="alert">Min 8 characters</span></div></div>
   <div class="form-row triple">
-    <div class="form-group"><label>City <span class="req">*</span></label><input type="text" name="curCity" data-min="2" autocomplete="address-level2" aria-describedby="err-curCity"><span class="error-msg" id="err-curCity" role="alert">Required</span></div>
-    <div class="form-group"><label>State <span class="req">*</span></label><select name="curState" aria-describedby="err-curState"><option value="">Select…</option></select><span class="error-msg" id="err-curState" role="alert">Required</span></div>
-    <div class="form-group"><label>ZIP <span class="req">*</span></label><input type="text" name="curZip" maxlength="5" pattern="\d{5}" inputmode="numeric" autocomplete="postal-code" aria-describedby="err-curZip"><span class="error-msg" id="err-curZip" role="alert">5-digit ZIP</span></div>
+    <div class="form-group"><label for="f-curCity">City <span class="req">*</span></label><input id="f-curCity" type="text" name="curCity" data-min="2" autocomplete="address-level2" aria-describedby="err-curCity"><span class="error-msg" id="err-curCity" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-curState">State <span class="req">*</span></label><select id="f-curState" name="curState" aria-describedby="err-curState"><option value="">Select…</option></select><span class="error-msg" id="err-curState" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-curZip">ZIP <span class="req">*</span></label><input id="f-curZip" type="text" name="curZip" maxlength="5" pattern="\d{5}" inputmode="numeric" autocomplete="postal-code" aria-describedby="err-curZip"><span class="error-msg" id="err-curZip" role="alert">5-digit ZIP</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Own or Rent <span class="req">*</span></label><select name="curOwnRent" aria-describedby="err-curOwnRent"><option value="">Select…</option><option>Own</option><option>Rent</option><option>Living Rent-Free</option></select><span class="error-msg" id="err-curOwnRent" role="alert">Required</span></div>
-    <div class="form-group"><label>Years at Address <span class="req">*</span></label><input type="number" name="curYears" min="0" max="99" inputmode="numeric" autocomplete="off" aria-describedby="err-curYears"><span class="error-msg" id="err-curYears" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-curOwnRent">Own or Rent <span class="req">*</span></label><select id="f-curOwnRent" name="curOwnRent" aria-describedby="err-curOwnRent"><option value="">Select…</option><option>Own</option><option>Rent</option><option>Living Rent-Free</option></select><span class="error-msg" id="err-curOwnRent" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-curYears">Years at Address <span class="req">*</span></label><input id="f-curYears" type="number" name="curYears" min="0" max="99" inputmode="numeric" autocomplete="off" aria-describedby="err-curYears"><span class="error-msg" id="err-curYears" role="alert">Required</span></div>
   </div>
-  <div class="form-row single"><div class="form-group"><label>Monthly Housing Expense (rent/mortgage payment)</label><input type="text" name="monthlyHousingExpense" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div></div>
+  <div class="form-row single"><div class="form-group"><label for="f-monthlyHousingExpense">Monthly Housing Expense (rent/mortgage payment)</label><input id="f-monthlyHousingExpense" type="text" name="monthlyHousingExpense" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div></div>
   <div id="prevAddrBlock" style="display:none">
     <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Previous Address (less than 2 years at current)</p>
-    <div class="form-row single"><div class="form-group"><label>Street <span class="req prev-req">*</span></label><input type="text" name="prevStreet" autocomplete="off" data-min="4" aria-describedby="err-prevStreet"><span class="error-msg" id="err-prevStreet" role="alert">Required</span></div></div>
+    <div class="form-row single"><div class="form-group"><label for="f-prevStreet">Street <span class="req prev-req">*</span></label><input id="f-prevStreet" type="text" name="prevStreet" autocomplete="off" data-min="4" aria-describedby="err-prevStreet"><span class="error-msg" id="err-prevStreet" role="alert">Required</span></div></div>
     <div class="form-row triple">
-      <div class="form-group"><label>City <span class="req prev-req">*</span></label><input type="text" name="prevCity" autocomplete="off" aria-describedby="err-prevCity"><span class="error-msg" id="err-prevCity" role="alert">Required</span></div>
-      <div class="form-group"><label>State <span class="req prev-req">*</span></label><select name="prevState" aria-describedby="err-prevState"><option value="">Select…</option></select><span class="error-msg" id="err-prevState" role="alert">Required</span></div>
-      <div class="form-group"><label>ZIP <span class="req prev-req">*</span></label><input type="text" name="prevZip" maxlength="5" inputmode="numeric" autocomplete="off" aria-describedby="err-prevZip"><span class="error-msg" id="err-prevZip" role="alert">5-digit ZIP</span></div>
+      <div class="form-group"><label for="f-prevCity">City <span class="req prev-req">*</span></label><input id="f-prevCity" type="text" name="prevCity" autocomplete="off" aria-describedby="err-prevCity"><span class="error-msg" id="err-prevCity" role="alert">Required</span></div>
+      <div class="form-group"><label for="f-prevState">State <span class="req prev-req">*</span></label><select id="f-prevState" name="prevState" aria-describedby="err-prevState"><option value="">Select…</option></select><span class="error-msg" id="err-prevState" role="alert">Required</span></div>
+      <div class="form-group"><label for="f-prevZip">ZIP <span class="req prev-req">*</span></label><input id="f-prevZip" type="text" name="prevZip" maxlength="5" inputmode="numeric" autocomplete="off" aria-describedby="err-prevZip"><span class="error-msg" id="err-prevZip" role="alert">5-digit ZIP</span></div>
     </div>
   </div>
 </div>
@@ -335,51 +335,51 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <!-- Step 5: Employment -->
 <div class="step" data-step="5">
   <div class="form-row">
-    <div class="form-group"><label>Employer Name <span class="req">*</span></label><input type="text" name="empName" data-min="2" autocomplete="off" aria-describedby="err-empName"><span class="error-msg" id="err-empName" role="alert">Required</span></div>
-    <div class="form-group"><label>Job Title <span class="req">*</span></label><input type="text" name="empTitle" data-min="2" autocomplete="off" aria-describedby="err-empTitle"><span class="error-msg" id="err-empTitle" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-empName">Employer Name <span class="req">*</span></label><input id="f-empName" type="text" name="empName" data-min="2" autocomplete="off" aria-describedby="err-empName"><span class="error-msg" id="err-empName" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-empTitle">Job Title <span class="req">*</span></label><input id="f-empTitle" type="text" name="empTitle" data-min="2" autocomplete="off" aria-describedby="err-empTitle"><span class="error-msg" id="err-empTitle" role="alert">Required</span></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Employer Phone</label><input type="tel" name="empPhone" inputmode="numeric" autocomplete="off"></div>
-    <div class="form-group"><label>Start Date <span class="req">*</span></label><input type="text" name="empStartDate" placeholder="MM/YYYY" inputmode="numeric" maxlength="7" autocomplete="off" aria-describedby="err-empStartDate"><span class="error-msg" id="err-empStartDate" role="alert">Enter as MM/YYYY</span></div>
+    <div class="form-group"><label for="f-empPhone">Employer Phone</label><input id="f-empPhone" type="tel" name="empPhone" inputmode="numeric" autocomplete="off"></div>
+    <div class="form-group"><label for="f-empStartDate">Start Date <span class="req">*</span></label><input id="f-empStartDate" type="text" name="empStartDate" placeholder="MM/YYYY" inputmode="numeric" maxlength="7" autocomplete="off" aria-describedby="err-empStartDate"><span class="error-msg" id="err-empStartDate" role="alert">Enter as MM/YYYY</span></div>
   </div>
   <div class="form-row single">
-    <div class="form-group"><label style="color:var(--gray-500);font-style:italic" id="empYearsCalc"></label>
-    <input type="hidden" name="empYears" value="">
+    <div class="form-group"><label style="color:var(--gray-500);font-style:italic" id="empYearsCalc" for="f-empYears"></label>
+    <input id="f-empYears" type="hidden" name="empYears" value="">
     </div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Self-Employed?</label><select name="selfEmployed"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+    <div class="form-group"><label for="f-selfEmployed">Self-Employed?</label><select id="f-selfEmployed" name="selfEmployed"><option value="No">No</option><option value="Yes">Yes</option></select></div>
     <div class="form-group"></div>
   </div>
 
-  <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Monthly Income Breakdown <span class="req">*</span></p>
+  <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Monthly Income Breakdown <span class="req">*</span> <span style="font-weight:400;font-style:italic;color:var(--gray-400);font-size:.75rem">(enter at least one source — leave the rest blank)</span></p>
   <div class="form-row">
-    <div class="form-group"><label>Base / Salary <span class="req">*</span></label><input type="text" name="baseIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric" aria-describedby="err-baseIncome"><span class="error-msg" id="err-baseIncome" role="alert">Required</span></div>
-    <div class="form-group"><label>Overtime</label><input type="text" name="overtimeIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-baseIncome">Base / Salary</label><input id="f-baseIncome" type="text" name="baseIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric" aria-describedby="err-baseIncome"><span class="error-msg" id="err-baseIncome" role="alert">Required</span></div>
+    <div class="form-group"><label for="f-overtimeIncome">Overtime</label><input id="f-overtimeIncome" type="text" name="overtimeIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Bonus</label><input type="text" name="bonusIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
-    <div class="form-group"><label>Commission</label><input type="text" name="commissionIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-bonusIncome">Bonus</label><input id="f-bonusIncome" type="text" name="bonusIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-commissionIncome">Commission</label><input id="f-commissionIncome" type="text" name="commissionIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Other Income</label><input type="text" name="otherIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
-    <div class="form-group"><label>Other Income Source</label><input type="text" name="otherIncomeSource" placeholder="e.g. rental, alimony" autocomplete="off"></div>
+    <div class="form-group"><label for="f-otherIncome">Other Income</label><input id="f-otherIncome" type="text" name="otherIncome" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-otherIncomeSource">Other Income Source</label><input id="f-otherIncomeSource" type="text" name="otherIncomeSource" placeholder="e.g. rental, alimony" autocomplete="off"></div>
   </div>
   <div class="form-row single">
-    <div class="form-group"><label style="font-weight:700;color:var(--gray-800)" id="totalIncomeLabel">Total Monthly Income: $0</label>
-    <input type="hidden" name="monthlyIncome" value="">
+    <div class="form-group"><label style="font-weight:700;color:var(--gray-800)" id="totalIncomeLabel" for="f-monthlyIncome">Total Monthly Income: $0</label>
+    <input id="f-monthlyIncome" type="hidden" name="monthlyIncome" value="">
     </div>
   </div>
 
   <div id="prevEmpBlock" style="display:none">
     <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Previous Employer (less than 2 years at current)</p>
     <div class="form-row">
-      <div class="form-group"><label>Employer <span class="req prev-emp-req">*</span></label><input type="text" name="prevEmpName" autocomplete="off" aria-describedby="err-prevEmpName"><span class="error-msg" id="err-prevEmpName" role="alert">Required</span></div>
-      <div class="form-group"><label>Title <span class="req prev-emp-req">*</span></label><input type="text" name="prevEmpTitle" autocomplete="off" aria-describedby="err-prevEmpTitle"><span class="error-msg" id="err-prevEmpTitle" role="alert">Required</span></div>
+      <div class="form-group"><label for="f-prevEmpName">Employer <span class="req prev-emp-req">*</span></label><input id="f-prevEmpName" type="text" name="prevEmpName" autocomplete="off" aria-describedby="err-prevEmpName"><span class="error-msg" id="err-prevEmpName" role="alert">Required</span></div>
+      <div class="form-group"><label for="f-prevEmpTitle">Title <span class="req prev-emp-req">*</span></label><input id="f-prevEmpTitle" type="text" name="prevEmpTitle" autocomplete="off" aria-describedby="err-prevEmpTitle"><span class="error-msg" id="err-prevEmpTitle" role="alert">Required</span></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Start Date <span class="req prev-emp-req">*</span></label><input type="text" name="prevEmpStartDate" placeholder="MM/YYYY" inputmode="numeric" maxlength="7" autocomplete="off" aria-describedby="err-prevEmpStartDate"><span class="error-msg" id="err-prevEmpStartDate" role="alert">Enter as MM/YYYY</span></div>
-      <div class="form-group"><label>Monthly Income</label><input type="text" name="prevEmpIncome" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+      <div class="form-group"><label for="f-prevEmpStartDate">Start Date <span class="req prev-emp-req">*</span></label><input id="f-prevEmpStartDate" type="text" name="prevEmpStartDate" placeholder="MM/YYYY" inputmode="numeric" maxlength="7" autocomplete="off" aria-describedby="err-prevEmpStartDate"><span class="error-msg" id="err-prevEmpStartDate" role="alert">Enter as MM/YYYY</span></div>
+      <div class="form-group"><label for="f-prevEmpIncome">Monthly Income</label><input id="f-prevEmpIncome" type="text" name="prevEmpIncome" placeholder="$" autocomplete="off" inputmode="numeric"></div>
     </div>
     <input type="hidden" name="prevEmpYears" value="">
   </div>
@@ -389,26 +389,26 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <div class="step" data-step="6">
   <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin-bottom:12px">Assets</p>
   <div class="form-row">
-    <div class="form-group"><label>Checking Account Balance</label><input type="text" name="checkingBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
-    <div class="form-group"><label>Savings Account Balance</label><input type="text" name="savingsBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-checkingBal">Checking Account Balance</label><input id="f-checkingBal" type="text" name="checkingBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-savingsBal">Savings Account Balance</label><input id="f-savingsBal" type="text" name="savingsBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
   </div>
-  <div class="form-row single"><div class="form-group"><label>Other Real Estate Owned (estimated value)</label><input type="text" name="otherRE" placeholder="$0" autocomplete="off" inputmode="numeric"></div></div>
+  <div class="form-row single"><div class="form-group"><label for="f-otherRE">Other Real Estate Owned (estimated value)</label><input id="f-otherRE" type="text" name="otherRE" placeholder="$0" autocomplete="off" inputmode="numeric"></div></div>
   <div class="form-row">
-    <div class="form-group"><label>Retirement Account Balance</label><input type="text" name="retirementBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
-    <div class="form-group"><label>Stocks/Bonds Balance</label><input type="text" name="stocksBondsBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-retirementBal">Retirement Account Balance</label><input id="f-retirementBal" type="text" name="retirementBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-stocksBondsBal">Stocks/Bonds Balance</label><input id="f-stocksBondsBal" type="text" name="stocksBondsBal" placeholder="$" autocomplete="off" inputmode="numeric"></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Gift Funds Amount</label><input type="text" name="giftFundsAmount" placeholder="$" autocomplete="off" inputmode="numeric"></div>
-    <div class="form-group"><label>Gift Funds Source</label><select name="giftFundsSource"><option value="">Select…</option><option>Relative</option><option>Employer</option><option>Government</option><option>Other</option></select></div>
+    <div class="form-group"><label for="f-giftFundsAmount">Gift Funds Amount</label><input id="f-giftFundsAmount" type="text" name="giftFundsAmount" placeholder="$" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-giftFundsSource">Gift Funds Source</label><select id="f-giftFundsSource" name="giftFundsSource"><option value="">Select…</option><option>Relative</option><option>Employer</option><option>Government</option><option>Other</option></select></div>
   </div>
   <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 12px">Monthly Debts</p>
   <div class="form-row">
-    <div class="form-group"><label>Auto Loan</label><input type="text" name="debtAuto" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
-    <div class="form-group"><label>Student Loans</label><input type="text" name="debtStudent" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-debtAuto">Auto Loan</label><input id="f-debtAuto" type="text" name="debtAuto" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-debtStudent">Student Loans</label><input id="f-debtStudent" type="text" name="debtStudent" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Credit Card Payments</label><input type="text" name="debtCC" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
-    <div class="form-group"><label>Other Mortgage</label><input type="text" name="debtMortgage" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-debtCC">Credit Card Payments</label><input id="f-debtCC" type="text" name="debtCC" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
+    <div class="form-group"><label for="f-debtMortgage">Other Mortgage</label><input id="f-debtMortgage" type="text" name="debtMortgage" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div>
   </div>
 </div>
 
@@ -441,7 +441,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div class="check-row"><input type="checkbox" id="consentCredit"><label for="consentCredit">I authorize a credit check and verification of the information provided. <span class="req">*</span></label></div>
   <div class="check-row"><input type="checkbox" id="consentEsign"><label for="consentEsign">I agree to conduct this transaction electronically (E-Sign consent). <span class="req">*</span></label></div>
   <div class="sig-group">
-    <label>Electronic Signature (type your full legal name) <span class="req">*</span></label>
+    <label for="eSignature">Electronic Signature (type your full legal name) <span class="req">*</span></label>
     <input type="text" id="eSignature" placeholder="Your Full Legal Name" autocomplete="off">
   </div>
 </div>
@@ -781,7 +781,8 @@ const empPhoneField = document.querySelector('[name="empPhone"]');
 if(empPhoneField){
   empPhoneField.addEventListener('input', e=>{
     let v = e.target.value.replace(/\D/g,'');
-    if(v.length>10) v = v.slice(0,11);
+    if(v.length===11 && v[0]==='1') v = v.slice(1);
+    if(v.length>10) v = v.slice(0,10);
     if(v.length>=7) v = '('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);
     else if(v.length>=4) v = '('+v.slice(0,3)+') '+v.slice(3);
     e.target.value = v;
@@ -793,7 +794,8 @@ const coBorrPhoneField = document.querySelector('[name="coBorrPhone"]');
 if(coBorrPhoneField){
   coBorrPhoneField.addEventListener('input', e=>{
     let v = e.target.value.replace(/\D/g,'');
-    if(v.length>10) v = v.slice(0,11);
+    if(v.length===11 && v[0]==='1') v = v.slice(1);
+    if(v.length>10) v = v.slice(0,10);
     if(v.length>=7) v = '('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);
     else if(v.length>=4) v = '('+v.slice(0,3)+') '+v.slice(3);
     e.target.value = v;
@@ -906,7 +908,8 @@ form.addEventListener('change', e=>{
 const phoneField = document.querySelector('[name="phone"]');
 phoneField.addEventListener('input',e=>{
   let v = e.target.value.replace(/\D/g,'');
-  if(v.length>10) v=v.slice(0,11);
+  if(v.length===11 && v[0]==='1') v=v.slice(1);
+  if(v.length>10) v=v.slice(0,10);
   if(v.length>=7) v='('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);
   else if(v.length>=4) v='('+v.slice(0,3)+') '+v.slice(3);
   e.target.value = v;
@@ -1090,6 +1093,20 @@ function validateStep(step){
   }
 
   if(step===5){
+    // At least one income source must be positive. Previously baseIncome alone was
+    // required, so anyone paid only by commission or bonus had to type a literal 0.
+    const incomeNames = ['baseIncome','overtimeIncome','bonusIncome','commissionIncome','otherIncome'];
+    const incomeTotal = incomeNames.reduce((sum,nm)=>{
+      const v = parseFloat((document.querySelector(`[name="${nm}"]`)?.value||'').replace(/[^0-9.]/g,''));
+      return sum + (isNaN(v)?0:v);
+    }, 0);
+    if(incomeTotal <= 0){
+      const base = document.querySelector('[name="baseIncome"]');
+      markBad(base);
+      showError('Please enter your monthly income in at least one field. Leave the ones that do not apply blank.', base);
+      return false;
+    }
+
     // BUG-10: previous employer fields
     if(document.getElementById('prevEmpBlock').style.display !== 'none'){
       const need = ['prevEmpName','prevEmpTitle','prevEmpStartDate'];
