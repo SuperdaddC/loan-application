@@ -144,6 +144,13 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* Spinner */
 .spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Error banner (replaces alert()) */
+.error-banner{background:var(--red-light);border-left:4px solid var(--red);padding:12px 16px;margin:0 0 16px;color:var(--red-dark);font-size:.85rem;border-radius:var(--radius);display:none;font-weight:500}
+.error-banner.show{display:block}
+.group-error{display:none;font-size:.75rem;color:var(--red);margin-top:-8px;margin-bottom:16px}
+.group-error.show{display:block}
+.option-card:focus-within{outline:2px solid var(--red);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -153,7 +160,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <img src="https://apuctuqlmykeemtcasji.supabase.co/storage/v1/object/public/profile-photos/57f82d21-31e6-45b9-aa0d-c7b8764f464a/1770136298733-ri7748.png" alt="Michael Colyer" width="64" height="64">
   <div class="header-info">
     <h1>The Colyer Team</h1>
-    <p>Michael Colyer · NMLS# 276626 · <a href="mailto:judy@vip.thecolyerteam.com">judy@vip.thecolyerteam.com</a></p>
+    <p>Michael Colyer · NMLS# 276626 · <a href="mailto:mike@thecolyerteam.com">mike@thecolyerteam.com</a></p>
   </div>
 </header>
 
@@ -168,12 +175,13 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <p class="step-subtitle" id="stepSubtitle">Let's get started — what are you looking for?</p>
 </div>
 
-<form id="loanForm" novalidate autocomplete="off">
+<form id="loanForm" method="post" novalidate autocomplete="off">
 <!-- Honeypot -->
-<div class="ohnohoney"><label>Leave blank<input type="text" name="website" id="ohnohoney" tabindex="-1" autocomplete="off"></label></div>
+<div class="ohnohoney" aria-hidden="true"><label aria-hidden="true">Leave blank<input type="text" name="website" id="ohnohoney" tabindex="-1" autocomplete="off" aria-hidden="true"></label></div>
 <input type="hidden" id="formLoadTime">
 
 <div class="form-body">
+<div class="error-banner" id="errorBanner" role="alert" aria-live="assertive"></div>
 
 <!-- Step 1: Loan Purpose -->
 <div class="step active" data-step="1">
@@ -183,6 +191,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <label class="option-card"><input type="radio" name="loanPurpose" value="Refinance"><div class="icon">🔄</div><div class="label">Refinance</div></label>
     <label class="option-card"><input type="radio" name="loanPurpose" value="Cash-Out Refi"><div class="icon">💰</div><div class="label">Cash-Out Refi</div></label>
   </div>
+  <span class="group-error" id="err-loanPurpose" role="alert">Please select a loan purpose</span>
   <label style="font-size:.8rem;font-weight:600;color:var(--gray-700);margin-bottom:10px;display:block">Property Type <span class="req">*</span></label>
   <div class="option-grid" data-field="propertyType">
     <label class="option-card"><input type="radio" name="propertyType" value="Single Family"><div class="icon">🏡</div><div class="label">Single Family</div></label>
@@ -190,10 +199,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <label class="option-card"><input type="radio" name="propertyType" value="Townhouse"><div class="icon">🏘️</div><div class="label">Townhouse</div></label>
     <label class="option-card"><input type="radio" name="propertyType" value="Multi-Unit"><div class="icon">🏗️</div><div class="label">Multi-Unit</div></label>
   </div>
+  <span class="group-error" id="err-propertyType" role="alert">Please select a property type</span>
   <div class="form-row">
     <div class="form-group" id="loanAmountGroup"><label>Loan Amount Requested <span class="req">*</span></label><input type="text" name="loanAmount" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-loanAmount"><span class="error-msg" id="err-loanAmount" role="alert">Required</span></div>
     <div class="form-group" id="purchasePriceGroup" style="display:none"><label>Estimated Purchase Price <span class="req">*</span></label><input type="text" name="purchasePrice" id="purchasePriceInput" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-purchasePrice"><span class="error-msg" id="err-purchasePrice" role="alert">Required</span></div>
     <div class="form-group"><label>Estimated Credit Score <span class="req">*</span></label><select name="estimatedCreditScore" aria-describedby="err-estimatedCreditScore"><option value="">Select…</option><option>760+</option><option>740-759</option><option>720-739</option><option>700-719</option><option>680-699</option><option>660-679</option><option>640-659</option><option>620-639</option><option>Below 620</option></select><span class="error-msg" id="err-estimatedCreditScore" role="alert">Required</span></div>
+  </div>
+  <div class="form-row single" id="cashOutRow" style="display:none">
+    <div class="form-group"><label>Cash Out Amount Requested <span class="req">*</span></label><input type="text" name="cashOutAmount" id="cashOutAmountInput" placeholder="$" autocomplete="off" inputmode="numeric" aria-describedby="err-cashOutAmount"><span class="error-msg" id="err-cashOutAmount" role="alert">Required</span></div>
   </div>
   <div class="form-row" id="downPaymentRow" style="display:none">
     <div class="form-group"><label>Down Payment Amount</label><input type="text" name="downPayment" id="downPaymentInput" placeholder="$" autocomplete="off" inputmode="numeric"></div>
@@ -242,16 +255,24 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="form-group"><label>Social Security Number <span class="req">*</span></label><input type="password" name="ssn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric" aria-describedby="err-ssn"><span class="error-msg" id="err-ssn" role="alert">9 digits required</span></div>
   </div>
 
-  <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Race/Ethnicity (HMDA)</p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px" id="raceEthnicityGroup">
-    <label class="check-row" style="margin:0"><input type="checkbox" name="raceEthnicity" value="American Indian/Alaska Native"> American Indian/Alaska Native</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="raceEthnicity" value="Asian"> Asian</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="raceEthnicity" value="Black/African American"> Black/African American</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="raceEthnicity" value="Native Hawaiian/Pacific Islander"> Native Hawaiian/Pacific Islander</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="raceEthnicity" value="White"> White</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="raceEthnicity" value="Hispanic/Latino"> Hispanic/Latino</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="raceEthnicity" value="Not Hispanic/Latino"> Not Hispanic/Latino</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="raceEthnicity" value="I do not wish to provide"> I do not wish to provide</label>
+  <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 4px">Demographic Information (HMDA)</p>
+  <p style="font-size:.75rem;color:var(--gray-500);margin:0 0 12px;line-height:1.5">The law requires we ask for this information to monitor compliance with equal credit opportunity and fair housing laws. You are not required to provide it.</p>
+
+  <p style="font-size:.8rem;font-weight:600;color:var(--gray-600);margin:0 0 8px">Ethnicity</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px" id="hmdaEthnicityGroup">
+    <label class="check-row" style="margin:0"><input type="radio" name="hmdaEthnicity" value="Hispanic or Latino" style="accent-color:var(--red)"> Hispanic or Latino</label>
+    <label class="check-row" style="margin:0"><input type="radio" name="hmdaEthnicity" value="Not Hispanic or Latino" style="accent-color:var(--red)"> Not Hispanic or Latino</label>
+    <label class="check-row" style="margin:0"><input type="radio" name="hmdaEthnicity" value="I do not wish to provide" style="accent-color:var(--red)"> I do not wish to provide</label>
+  </div>
+
+  <p style="font-size:.8rem;font-weight:600;color:var(--gray-600);margin:0 0 8px">Race <span style="font-weight:400;font-style:italic;color:var(--gray-400)">(select all that apply)</span></p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px" id="hmdaRaceGroup">
+    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="American Indian or Alaska Native"> American Indian or Alaska Native</label>
+    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="Asian"> Asian</label>
+    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="Black or African American"> Black or African American</label>
+    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="Native Hawaiian or Other Pacific Islander"> Native Hawaiian or Other Pacific Islander</label>
+    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="White"> White</label>
+    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="I do not wish to provide"> I do not wish to provide</label>
   </div>
 
   <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:0 0 10px">Sex</p>
@@ -263,20 +284,20 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
   <div style="margin-top:16px">
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--gray-700)">
-      <input type="checkbox" id="addCoBorrower" style="accent-color:var(--red);width:18px;height:18px"> Add Co-Borrower
+      <input type="checkbox" id="addCoBorrower" name="addCoBorrower" value="Yes" style="accent-color:var(--red);width:18px;height:18px"> Add Co-Borrower
     </label>
     <div id="coBorrowerBlock" style="display:none;margin-top:12px;padding:16px;border:1px solid var(--gray-200);border-radius:var(--radius-lg);background:var(--gray-50)">
       <div class="form-row">
-        <div class="form-group"><label>Co-Borrower First Name</label><input type="text" name="coBorrFirstName" autocomplete="off"></div>
-        <div class="form-group"><label>Co-Borrower Last Name</label><input type="text" name="coBorrLastName" autocomplete="off"></div>
+        <div class="form-group"><label>Co-Borrower First Name <span class="req cb-req">*</span></label><input type="text" name="coBorrFirstName" autocomplete="off" aria-describedby="err-coBorrFirstName"><span class="error-msg" id="err-coBorrFirstName" role="alert">Required</span></div>
+        <div class="form-group"><label>Co-Borrower Last Name <span class="req cb-req">*</span></label><input type="text" name="coBorrLastName" autocomplete="off" aria-describedby="err-coBorrLastName"><span class="error-msg" id="err-coBorrLastName" role="alert">Required</span></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Co-Borrower Email</label><input type="email" name="coBorrEmail" autocomplete="off"></div>
+        <div class="form-group"><label>Co-Borrower Email <span class="req cb-req">*</span></label><input type="email" name="coBorrEmail" autocomplete="off" aria-describedby="err-coBorrEmail"><span class="error-msg" id="err-coBorrEmail" role="alert">Valid email required</span></div>
         <div class="form-group"><label>Co-Borrower Phone</label><input type="tel" name="coBorrPhone" inputmode="numeric" autocomplete="off"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>Co-Borrower Date of Birth</label><input type="text" name="coBorrDob" placeholder="MM/DD/YYYY" inputmode="numeric" maxlength="10" autocomplete="off"></div>
-        <div class="form-group"><label>Co-Borrower SSN</label><input type="password" name="coBorrSsn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric"></div>
+        <div class="form-group"><label>Co-Borrower SSN <span class="req cb-req">*</span></label><input type="password" name="coBorrSsn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric" aria-describedby="err-coBorrSsn"><span class="error-msg" id="err-coBorrSsn" role="alert">9 digits required</span></div>
       </div>
       <div class="form-row single">
         <div class="form-group"><label>Co-Borrower Marital Status</label><select name="coBorrMarital"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></div>
@@ -300,11 +321,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div class="form-row single"><div class="form-group"><label>Monthly Housing Expense (rent/mortgage payment)</label><input type="text" name="monthlyHousingExpense" placeholder="$/mo" autocomplete="off" inputmode="numeric"></div></div>
   <div id="prevAddrBlock" style="display:none">
     <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Previous Address (less than 2 years at current)</p>
-    <div class="form-row single"><div class="form-group"><label>Street</label><input type="text" name="prevStreet" autocomplete="off"></div></div>
+    <div class="form-row single"><div class="form-group"><label>Street <span class="req prev-req">*</span></label><input type="text" name="prevStreet" autocomplete="off" data-min="4" aria-describedby="err-prevStreet"><span class="error-msg" id="err-prevStreet" role="alert">Required</span></div></div>
     <div class="form-row triple">
-      <div class="form-group"><label>City</label><input type="text" name="prevCity" autocomplete="off"></div>
-      <div class="form-group"><label>State</label><select name="prevState"><option value="">Select…</option></select></div>
-      <div class="form-group"><label>ZIP</label><input type="text" name="prevZip" maxlength="5" autocomplete="off"></div>
+      <div class="form-group"><label>City <span class="req prev-req">*</span></label><input type="text" name="prevCity" autocomplete="off" aria-describedby="err-prevCity"><span class="error-msg" id="err-prevCity" role="alert">Required</span></div>
+      <div class="form-group"><label>State <span class="req prev-req">*</span></label><select name="prevState" aria-describedby="err-prevState"><option value="">Select…</option></select><span class="error-msg" id="err-prevState" role="alert">Required</span></div>
+      <div class="form-group"><label>ZIP <span class="req prev-req">*</span></label><input type="text" name="prevZip" maxlength="5" autocomplete="off" aria-describedby="err-prevZip"><span class="error-msg" id="err-prevZip" role="alert">5-digit ZIP</span></div>
     </div>
   </div>
 </div>
@@ -351,11 +372,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div id="prevEmpBlock" style="display:none">
     <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 10px">Previous Employer (less than 2 years at current)</p>
     <div class="form-row">
-      <div class="form-group"><label>Employer</label><input type="text" name="prevEmpName" autocomplete="off"></div>
-      <div class="form-group"><label>Title</label><input type="text" name="prevEmpTitle" autocomplete="off"></div>
+      <div class="form-group"><label>Employer <span class="req prev-emp-req">*</span></label><input type="text" name="prevEmpName" autocomplete="off" aria-describedby="err-prevEmpName"><span class="error-msg" id="err-prevEmpName" role="alert">Required</span></div>
+      <div class="form-group"><label>Title <span class="req prev-emp-req">*</span></label><input type="text" name="prevEmpTitle" autocomplete="off" aria-describedby="err-prevEmpTitle"><span class="error-msg" id="err-prevEmpTitle" role="alert">Required</span></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Start Date</label><input type="text" name="prevEmpStartDate" placeholder="MM/YYYY" inputmode="numeric" maxlength="7" autocomplete="off"></div>
+      <div class="form-group"><label>Start Date <span class="req prev-emp-req">*</span></label><input type="text" name="prevEmpStartDate" placeholder="MM/YYYY" inputmode="numeric" maxlength="7" autocomplete="off" aria-describedby="err-prevEmpStartDate"><span class="error-msg" id="err-prevEmpStartDate" role="alert">Enter as MM/YYYY</span></div>
       <div class="form-group"><label>Monthly Income</label><input type="text" name="prevEmpIncome" placeholder="$" autocomplete="off" inputmode="numeric"></div>
     </div>
     <input type="hidden" name="prevEmpYears" value="">
@@ -486,6 +507,33 @@ window.onTurnstileSuccess = onTurnstileSuccess;
 // Timestamp for bot protection
 document.getElementById('formLoadTime').value = Date.now();
 
+// ===== Error banner (replaces alert() to eliminate freeze/UX issues) =====
+const errorBanner = document.getElementById('errorBanner');
+let _errorTimer = null;
+function showError(msg, focusEl){
+  errorBanner.textContent = msg;
+  errorBanner.classList.add('show');
+  // Scroll banner into view (safe — banner is always visible and non-zero size)
+  try { errorBanner.scrollIntoView({behavior:'smooth', block:'center'}); } catch(_) {}
+  clearTimeout(_errorTimer);
+  _errorTimer = setTimeout(()=>errorBanner.classList.remove('show'), 8000);
+  // Focus target field only if it's actually visible (guards against zero-size / hidden targets)
+  if(focusEl && isVisible(focusEl)){
+    try { focusEl.focus({preventScroll:true}); } catch(_) {}
+  }
+}
+function clearError(){
+  errorBanner.classList.remove('show');
+  errorBanner.textContent = '';
+}
+function isVisible(el){
+  if(!el) return false;
+  const r = el.getBoundingClientRect();
+  if(r.width===0 && r.height===0) return false;
+  const s = window.getComputedStyle(el);
+  return s.display !== 'none' && s.visibility !== 'hidden';
+}
+
 // States dropdown
 const states = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
 document.querySelectorAll('select[name$="State"]').forEach(sel=>{
@@ -569,12 +617,16 @@ document.querySelectorAll('.option-card input').forEach(inp=>{
   inp.addEventListener('change',()=>{
     inp.closest('.option-grid').querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
     inp.closest('.option-card').classList.add('selected');
+    // Clear group-error when a card is selected
+    if(inp.name === 'loanPurpose') setGroupError('err-loanPurpose', false);
+    if(inp.name === 'propertyType') setGroupError('err-propertyType', false);
   });
 });
 
-// Show/hide fields based on Loan Purpose (Purchase vs Refi)
+// Show/hide fields based on Loan Purpose (Purchase / Refinance / Cash-Out Refi)
 function updatePurposeFields(purpose){
   const isPurchase = purpose === 'Purchase';
+  const isCashOut  = purpose === 'Cash-Out Refi';
   // Loan Amount Requested (refi) vs Estimated Purchase Price (purchase)
   document.getElementById('loanAmountGroup').style.display = isPurchase ? 'none' : 'flex';
   document.getElementById('purchasePriceGroup').style.display = isPurchase ? 'flex' : 'none';
@@ -582,10 +634,14 @@ function updatePurposeFields(purpose){
   document.getElementById('downPaymentRow').style.display = isPurchase ? 'grid' : 'none';
   // Calculated loan amount row
   document.getElementById('calcLoanAmountRow').style.display = isPurchase ? 'flex' : 'none';
+  // Cash-out amount row
+  document.getElementById('cashOutRow').style.display = isCashOut ? 'flex' : 'none';
   // Clear calculated display if switching away from purchase
   if(!isPurchase){
     document.getElementById('calcLoanAmountDisplay').value = '';
     document.getElementById('downPaymentErrorMsg').style.display = 'none';
+    const la = document.querySelector('[name="loanAmount"]');
+    // Do not clear loanAmount named value — user may have entered it for refi
   }
   // Recalculate if switching to purchase
   if(isPurchase) calcLoanAmount();
@@ -594,7 +650,11 @@ document.querySelectorAll('[name="loanPurpose"]').forEach(inp=>{
   inp.addEventListener('change',()=>updatePurposeFields(inp.value));
 });
 
+// Sane currency ceiling — reject beyond $10M as garbage
+const CURRENCY_MAX = 10000000;
+
 // Auto-calculate Loan Amount for Purchase loans
+// BUG-4 fix: also write calc value into the named [loanAmount] field so payload is correct.
 function calcLoanAmount(){
   const ppRaw = document.getElementById('purchasePriceInput').value.replace(/[^0-9.]/g,'');
   const dpRaw = document.getElementById('downPaymentInput').value.replace(/[^0-9.]/g,'');
@@ -602,16 +662,20 @@ function calcLoanAmount(){
   const dp = parseFloat(dpRaw)||0;
   const errMsg = document.getElementById('downPaymentErrorMsg');
   const display = document.getElementById('calcLoanAmountDisplay');
+  const loanAmountField = document.querySelector('[name="loanAmount"]');
   if(dp > pp && pp > 0){
     errMsg.style.display = 'block';
     display.value = '—';
+    if(loanAmountField) loanAmountField.value = '';
   } else {
     errMsg.style.display = 'none';
     if(pp > 0){
       const loanAmt = pp - dp;
       display.value = '$'+loanAmt.toLocaleString('en-US');
+      if(loanAmountField) loanAmountField.value = String(loanAmt);
     } else {
       display.value = '';
+      if(loanAmountField) loanAmountField.value = '';
     }
   }
 }
@@ -640,25 +704,88 @@ function calcYearsFromStart(mmyyyy){
   let years=(now.getFullYear()-y)+((now.getMonth()+1-m)/12);
   return Math.max(0,Math.round(years*10)/10);
 }
+// SUB-4: years between two MM/YYYY strings (prev job start → current job start)
+function calcYearsBetween(fromMmyyyy, toMmyyyy){
+  const p1 = fromMmyyyy.split('/'), p2 = toMmyyyy.split('/');
+  if(p1.length!==2 || p2.length!==2) return null;
+  const m1=parseInt(p1[0]), y1=parseInt(p1[1]);
+  const m2=parseInt(p2[0]), y2=parseInt(p2[1]);
+  if(!m1||!y1||!m2||!y2) return null;
+  const yrs = (y2-y1) + ((m2-m1)/12);
+  return Math.max(0, Math.round(yrs*10)/10);
+}
+// BUG-11 helper: reject start dates in the future
+function isFutureMonthYear(mmyyyy){
+  const parts = mmyyyy.split('/');
+  if(parts.length!==2) return false;
+  const m = parseInt(parts[0]), y = parseInt(parts[1]);
+  if(!m||!y) return false;
+  const now = new Date();
+  return (y > now.getFullYear()) || (y === now.getFullYear() && m > (now.getMonth()+1));
+}
+// NEW-1 fix: strict MM/DD/YYYY parser. Returns Date if roundtrips cleanly, else null.
+function parseStrictDate(mmddyyyy){
+  if(!/^\d{2}\/\d{2}\/\d{4}$/.test(mmddyyyy)) return null;
+  const [m,d,y] = mmddyyyy.split('/').map(Number);
+  if(y < 1900 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+  const dt = new Date(y, m-1, d);
+  if(isNaN(dt.getTime())) return null;
+  // Roundtrip check catches Feb 30, Apr 31, etc.
+  if(dt.getFullYear() !== y || dt.getMonth() !== (m-1) || dt.getDate() !== d) return null;
+  return dt;
+}
+// Strict MM/YYYY parser (for employment start dates)
+function parseStrictMonthYear(mmyyyy){
+  if(!/^\d{2}\/\d{4}$/.test(mmyyyy)) return null;
+  const [m,y] = mmyyyy.split('/').map(Number);
+  if(y < 1900 || m < 1 || m > 12) return null;
+  const now = new Date();
+  if(y > now.getFullYear() + 1) return null;
+  return {m, y};
+}
 document.querySelectorAll('[name="empStartDate"],[name="prevEmpStartDate"]').forEach(field=>{
   field.addEventListener('input',e=>{
     let v=e.target.value.replace(/\D/g,'');
     if(v.length>6) v=v.slice(0,6);
     if(v.length>=3) v=v.slice(0,2)+'/'+v.slice(2);
     e.target.value=v;
-    // Auto-calc years
+    // Auto-calc years (BUG-25: store decimal, not floored int)
     if(v.length===7){
       const yrs=calcYearsFromStart(v);
       if(field.name==='empStartDate'){
-        document.querySelector('[name="empYears"]').value=yrs!==null?Math.floor(yrs):'';
-        document.getElementById('empYearsCalc').textContent=yrs!==null?`≈ ${yrs.toFixed(1)} years at current employer`:'';
-        document.getElementById('prevEmpBlock').style.display=(yrs!==null&&yrs<2)?'block':'none';
+        document.querySelector('[name="empYears"]').value = yrs!==null ? yrs.toFixed(1) : '';
+        document.getElementById('empYearsCalc').textContent = yrs!==null ? `≈ ${yrs.toFixed(1)} years at current employer` : '';
+        document.getElementById('prevEmpBlock').style.display = (yrs!==null && yrs<2) ? 'block' : 'none';
       }else{
-        document.querySelector('[name="prevEmpYears"]').value=yrs!==null?Math.floor(yrs):'';
+        document.querySelector('[name="prevEmpYears"]').value = yrs!==null ? yrs.toFixed(1) : '';
       }
     }
   });
 });
+
+// BUG-21: employer phone formatting (mirrors borrower phone)
+const empPhoneField = document.querySelector('[name="empPhone"]');
+if(empPhoneField){
+  empPhoneField.addEventListener('input', e=>{
+    let v = e.target.value.replace(/\D/g,'');
+    if(v.length>10) v = v.slice(0,11);
+    if(v.length>=7) v = '('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);
+    else if(v.length>=4) v = '('+v.slice(0,3)+') '+v.slice(3);
+    e.target.value = v;
+  });
+}
+
+// Co-borrower phone formatting
+const coBorrPhoneField = document.querySelector('[name="coBorrPhone"]');
+if(coBorrPhoneField){
+  coBorrPhoneField.addEventListener('input', e=>{
+    let v = e.target.value.replace(/\D/g,'');
+    if(v.length>10) v = v.slice(0,11);
+    if(v.length>=7) v = '('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);
+    else if(v.length>=4) v = '('+v.slice(0,3)+') '+v.slice(3);
+    e.target.value = v;
+  });
+}
 
 // Income auto-total
 function updateIncomeTotal(){
@@ -693,17 +820,49 @@ if(coBorrSsnField){
   });
 }
 
-// HMDA mutual exclusion — Hispanic/Latino vs Not Hispanic/Latino
-const hispEl = document.querySelector('[name="raceEthnicity"][value="Hispanic/Latino"]');
-const notHispEl = document.querySelector('[name="raceEthnicity"][value="Not Hispanic/Latino"]');
-if(hispEl && notHispEl){
-  hispEl.addEventListener('change', () => { if(hispEl.checked) notHispEl.checked = false; });
-  notHispEl.addEventListener('change', () => { if(notHispEl.checked) hispEl.checked = false; });
+// HMDA: "I do not wish to provide" on Race clears the specific races, and vice versa
+const raceDecline = document.querySelector('[name="hmdaRace"][value="I do not wish to provide"]');
+const raceSpecific = Array.from(document.querySelectorAll('[name="hmdaRace"]')).filter(el => el !== raceDecline);
+if(raceDecline){
+  raceDecline.addEventListener('change', () => {
+    if(raceDecline.checked) raceSpecific.forEach(el => { el.checked = false; });
+  });
+  raceSpecific.forEach(el => el.addEventListener('change', () => {
+    if(el.checked) raceDecline.checked = false;
+  }));
 }
 
-// Currency formatting (exclude phone/tel fields)
+// Currency formatting (exclude phone/tel fields, SSN, DOB, ZIP, dependents, empStartDate)
+// BUG-3: strip non-numeric on input; BUG-9: cap at CURRENCY_MAX
+function isCurrencyField(inp){
+  if(inp.type==='tel') return false;
+  if(inp.type==='number') return false;
+  if(!inp.inputMode || inp.inputMode!=='numeric') return false;
+  const skip = ['phone','ssn','coBorrSsn','dob','coBorrDob','empStartDate','prevEmpStartDate','propZip','curZip','prevZip','coBorrPhone','empPhone','dependents','curYears'];
+  if(skip.includes(inp.name)) return false;
+  if(inp.name && inp.name.toLowerCase().includes('phone')) return false;
+  if(inp.name && inp.name.toLowerCase().endsWith('zip')) return false;
+  return true;
+}
 document.querySelectorAll('[inputmode="numeric"]').forEach(inp=>{
-  if(inp.type==='tel'||inp.name.toLowerCase().includes('phone')||inp.name==='ssn'||inp.name==='coBorrSsn'||inp.name==='dob'||inp.name==='coBorrDob'||inp.name==='empStartDate'||inp.name==='prevEmpStartDate') return;
+  if(!isCurrencyField(inp)) return;
+  inp.addEventListener('input',()=>{
+    // Keep only digits and one decimal point during typing
+    const raw = inp.value.replace(/[^0-9.]/g,'');
+    const parts = raw.split('.');
+    let cleaned = parts[0] + (parts.length>1 ? '.'+parts.slice(1).join('').slice(0,2) : '');
+    // Enforce ceiling
+    const n = parseFloat(cleaned);
+    if(!isNaN(n) && n > CURRENCY_MAX){
+      cleaned = String(CURRENCY_MAX);
+    }
+    if(cleaned !== inp.value.replace(/[$,]/g,'')){
+      // Only rewrite if different, to keep caret sane
+      const pos = inp.selectionStart;
+      inp.value = cleaned;
+      try { inp.setSelectionRange(pos, pos); } catch(_) {}
+    }
+  });
   inp.addEventListener('blur',()=>{
     const v = inp.value.replace(/[^0-9.]/g,'');
     if(v) inp.value = '$'+Number(v).toLocaleString('en-US');
@@ -711,6 +870,23 @@ document.querySelectorAll('[inputmode="numeric"]').forEach(inp=>{
   inp.addEventListener('focus',()=>{
     inp.value = inp.value.replace(/[^0-9.]/g,'');
   });
+});
+
+// BUG-12: clear field-level invalid state as the user types / on blur when it becomes valid
+form.addEventListener('input', e=>{
+  const t = e.target;
+  if(t && t.classList && t.classList.contains('invalid') && (t.value||'').trim()){
+    t.classList.remove('invalid');
+  }
+  // Autosave (BUG-5)
+  scheduleAutosave();
+});
+form.addEventListener('change', e=>{
+  const t = e.target;
+  if(t && t.classList && t.classList.contains('invalid') && (t.value||'').trim()){
+    t.classList.remove('invalid');
+  }
+  scheduleAutosave();
 });
 
 // Phone formatting
@@ -734,101 +910,227 @@ document.querySelectorAll('[name="dob"],[name="coBorrDob"]').forEach(field=>{
   });
 });
 
-// Validation
+// ===== Validation (no alert() calls — inline errors only) =====
+function setGroupError(id, show){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('show', !!show);
+}
+
 function validateStep(step){
+  clearError();
+  setGroupError('err-loanPurpose', false);
+  setGroupError('err-propertyType', false);
   let valid = true;
+  let firstBad = null;
   const el = document.querySelector(`.step[data-step="${step}"]`);
+  const markBad = (inp) => { if(inp){ inp.classList.add('invalid'); if(!firstBad) firstBad = inp; } };
+  const errs = [];
+
   if(step===1){
-    if(!form.loanPurpose.value){valid=false;alert('Please select a loan purpose.');}
-    else if(!form.propertyType.value){valid=false;alert('Please select a property type.');}
-    else if(form.loanPurpose.value==='Purchase'){
-      // For purchase: require purchase price, down payment, and validate amounts
+    // NEW-4: collect all Step 1 errors, don't return on first
+    if(!form.loanPurpose.value){
+      setGroupError('err-loanPurpose', true);
+      errs.push('Please select a loan purpose.');
+    }
+    if(!form.propertyType.value){
+      setGroupError('err-propertyType', true);
+      errs.push('Please select a property type.');
+    }
+    const cs = document.querySelector('[name="estimatedCreditScore"]');
+    if(!cs.value){ markBad(cs); errs.push('Please select an estimated credit score.'); }
+    if(form.loanPurpose.value==='Purchase'){
       const pp = document.getElementById('purchasePriceInput');
-      if(!pp||!pp.value||pp.value==='$0'||pp.value===''){
-        alert('Please enter an estimated purchase price.');
-        pp?.scrollIntoView({behavior:'smooth',block:'center'});
-        return false;
-      }
-      const dp = document.getElementById('downPaymentInput');
-      if(!dp||!dp.value||dp.value==='$0'||dp.value===''){
-        alert('Please enter a down payment amount for a purchase loan.');
-        dp?.scrollIntoView({behavior:'smooth',block:'center'});
-        return false;
-      }
       const ppVal = parseFloat((pp.value||'').replace(/[^0-9.]/g,''))||0;
+      const dp = document.getElementById('downPaymentInput');
       const dpVal = parseFloat((dp.value||'').replace(/[^0-9.]/g,''))||0;
-      if(dpVal > ppVal){
-        alert('Down payment cannot exceed purchase price.');
-        dp?.scrollIntoView({behavior:'smooth',block:'center'});
+      if(ppVal <= 0){ markBad(pp); errs.push('Please enter an estimated purchase price.'); }
+      if(dpVal <= 0){ markBad(dp); errs.push('Please enter a down payment amount.'); }
+      // BUG-8: down > price is an ERROR, not a silent dash
+      if(ppVal > 0 && dpVal > 0 && dpVal > ppVal){
+        markBad(dp);
+        errs.push('Down payment cannot exceed the purchase price.');
+      }
+    } else if(form.loanPurpose.value){
+      // Refi + Cash-Out: require loan amount
+      const la = document.querySelector('[name="loanAmount"]');
+      const laVal = parseFloat((la.value||'').replace(/[^0-9.]/g,''))||0;
+      if(laVal <= 0){ markBad(la); errs.push('Please enter the loan amount requested.'); }
+      if(form.loanPurpose.value==='Cash-Out Refi'){
+        const co = document.getElementById('cashOutAmountInput');
+        const coVal = parseFloat((co.value||'').replace(/[^0-9.]/g,''))||0;
+        if(coVal <= 0){ markBad(co); errs.push('Please enter the cash-out amount requested.'); }
+      }
+    }
+    if(errs.length){
+      showError(errs.length === 1 ? errs[0] : ('Please fix ' + errs.length + ' items to continue: ' + errs.join(' ')), firstBad);
+      return false;
+    }
+    return true;
+  }
+
+  // BUG-2: property address fields must always be validated (removed isPurchase skip)
+  el.querySelectorAll('input[type="text"],input[type="email"],input[type="tel"],input[type="date"],input[type="number"],input[type="password"],select').forEach(inp=>{
+    const grp = inp.closest('.form-group');
+    if(!grp) return;
+    // Skip inputs inside hidden containers (e.g. previous address block when curYears>=2)
+    if(!isVisible(grp)) return;
+    const lbl = grp.querySelector('label');
+    const required = lbl?.querySelector('.req');
+    if(!required) return;
+    inp.classList.remove('invalid');
+    const val = inp.value.trim();
+    if(!val){ markBad(inp); valid = false; return; }
+    const min = inp.dataset.min;
+    if(min && val.length < parseInt(min)){ markBad(inp); valid = false; return; }
+    if(inp.type==='email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)){ markBad(inp); valid = false; return; }
+    if(inp.name==='phone'){ const d=val.replace(/\D/g,''); if(d.length<10||d.length>11){ markBad(inp); valid=false; return; } }
+    if(inp.name==='ssn'){ const d=val.replace(/\D/g,''); if(d.length!==9){ markBad(inp); valid=false; return; } }
+    if(inp.name && inp.name.endsWith('Zip') && !/^\d{5}$/.test(val)){ markBad(inp); valid=false; return; }
+    if(inp.name==='empStartDate' || inp.name==='prevEmpStartDate'){
+      const parsed = parseStrictMonthYear(val);
+      if(!parsed){ markBad(inp); valid=false; return; }
+      // BUG-11: no future start dates
+      if(isFutureMonthYear(val)){ markBad(inp); valid=false; return; }
+    }
+  });
+
+  if(step===3){
+    // NEW-1 fix: strict DOB parsing catches Feb 30, 13/45/1990, 99/99/1999 etc.
+    // NEW-3 fix: specific error text based on actual failure mode.
+    const dobField = document.querySelector('[name="dob"]');
+    const dobVal = dobField?.value || '';
+    if(dobVal){
+      const dob = parseStrictDate(dobVal);
+      if(!dob){
+        markBad(dobField);
+        showError('That date of birth is not a real calendar date. Please enter as MM/DD/YYYY.', dobField);
         return false;
       }
-    } else {
-      // Refi/Cash-Out: validate loanAmount field
-      const la = document.querySelector('[name="loanAmount"]');
-      if(!la||!la.value||la.value==='$0'||la.value===''){
-        alert('Please enter the loan amount requested.');
-        la?.scrollIntoView({behavior:'smooth',block:'center'});
+      const now = new Date();
+      if(dob > now){
+        markBad(dobField);
+        showError('Date of birth cannot be in the future.', dobField);
+        return false;
+      }
+      const age = (now - dob) / (365.25*24*60*60*1000);
+      if(age < 18){
+        markBad(dobField);
+        showError('Borrower must be at least 18 years old.', dobField);
         return false;
       }
     }
-    return valid;
-  }
-  // Validate required fields in step
-  const isPurchase = form.loanPurpose.value === 'Purchase';
-  const propFields = ['propAddress','propCity','propState','propZip'];
-  el.querySelectorAll('input[type="text"],input[type="email"],input[type="tel"],input[type="date"],input[type="number"],input[type="password"],select').forEach(inp=>{
-    const lbl = inp.closest('.form-group')?.querySelector('label');
-    const required = lbl?.querySelector('.req');
-    if(!required) return;
-    // Skip property address validation for Purchase
-    if(isPurchase && propFields.includes(inp.name)) return;
-    inp.classList.remove('invalid');
-    let val = inp.value.trim();
-    if(!val){inp.classList.add('invalid');valid=false;return;}
-    const min = inp.dataset.min;
-    if(min && val.length<parseInt(min)){inp.classList.add('invalid');valid=false;return;}
-    if(inp.type==='email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)){inp.classList.add('invalid');valid=false;return;}
-    if(inp.name==='phone'){const digits=val.replace(/\D/g,'');if(digits.length<10||digits.length>11){inp.classList.add('invalid');valid=false;return;}}
-    if(inp.name==='ssn'){const digits=val.replace(/\D/g,'');if(digits.length!==9){inp.classList.add('invalid');valid=false;return;}}
-    if(inp.name.endsWith('Zip')&&!/^\d{5}$/.test(val)){inp.classList.add('invalid');valid=false;return;}
-    if(inp.name==='empStartDate'&&!/^\d{2}\/\d{4}$/.test(val)){inp.classList.add('invalid');valid=false;return;}
-  });
-  if(step===3){
-    // Age validation — must be 18+
-    const dobVal = document.querySelector('[name="dob"]')?.value;
-    if(dobVal){
-      const [m,d,y] = dobVal.split('/').map(Number);
-      const dob = new Date(y,m-1,d);
-      const age = (new Date() - dob) / (365.25*24*60*60*1000);
-      if(age < 18){
-        alert('Borrower must be at least 18 years old.');
+    // Co-borrower DOB if present — same strict parse
+    const cbDobField = document.querySelector('[name="coBorrDob"]');
+    if(document.getElementById('addCoBorrower')?.checked && cbDobField && cbDobField.value){
+      const cbDob = parseStrictDate(cbDobField.value);
+      if(!cbDob){
+        markBad(cbDobField);
+        showError('That co-borrower date of birth is not a real calendar date. Please enter as MM/DD/YYYY.', cbDobField);
+        return false;
+      }
+      if(cbDob > new Date()){
+        markBad(cbDobField);
+        showError('Co-borrower date of birth cannot be in the future.', cbDobField);
         return false;
       }
     }
     // Co-borrower required fields when co-borrower is added
     if(document.getElementById('addCoBorrower')?.checked){
+      let cbErrs = 0;
       const cbReq = ['coBorrFirstName','coBorrLastName','coBorrEmail','coBorrSsn'];
       for(const fn of cbReq){
         const f = document.querySelector(`[name="${fn}"]`);
-        if(!f||!f.value.trim()){
-          alert('Please complete all required co-borrower fields (First Name, Last Name, Email, SSN).');
-          f?.scrollIntoView({behavior:'smooth',block:'center'});
-          return false;
-        }
+        if(!f || !f.value.trim()){ markBad(f); cbErrs++; }
       }
-    }
-  }
-  if(step===7){
-    // Validate all declarations are answered
-    const declGroups = document.querySelectorAll('.decl-toggle');
-    for(let i=0;i<declGroups.length;i++){
-      const answered = declGroups[i].querySelector('input[type="radio"]:checked');
-      if(!answered){
-        alert('Please answer all declaration questions before continuing.');
-        declGroups[i].scrollIntoView({behavior:'smooth',block:'center'});
+      const cbEmail = document.querySelector('[name="coBorrEmail"]');
+      if(cbEmail && cbEmail.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cbEmail.value)){
+        markBad(cbEmail); cbErrs++;
+      }
+      const cbSsn = document.querySelector('[name="coBorrSsn"]');
+      if(cbSsn && cbSsn.value && cbSsn.value.replace(/\D/g,'').length !== 9){
+        markBad(cbSsn); cbErrs++;
+      }
+      if(cbErrs){
+        showError('Please complete the highlighted co-borrower fields.', firstBad);
         return false;
       }
     }
+  }
+
+  if(step===4){
+    // BUG-10: if previous address block is visible, require its fields (now with per-field markers)
+    if(document.getElementById('prevAddrBlock').style.display !== 'none'){
+      const need = ['prevStreet','prevCity','prevState','prevZip'];
+      let hit = 0;
+      for(const fn of need){
+        const f = document.querySelector(`[name="${fn}"]`);
+        if(!f || !f.value.trim()){ markBad(f); hit++; }
+      }
+      // ZIP shape check
+      const zip = document.querySelector('[name="prevZip"]');
+      if(zip && zip.value && !/^\d{5}$/.test(zip.value)){ markBad(zip); hit++; }
+      if(hit){
+        showError('Please complete your previous address (you indicated less than 2 years at your current address).', firstBad);
+        return false;
+      }
+    }
+  }
+
+  if(step===5){
+    // BUG-10: previous employer fields
+    if(document.getElementById('prevEmpBlock').style.display !== 'none'){
+      const need = ['prevEmpName','prevEmpTitle','prevEmpStartDate'];
+      let hit = 0;
+      for(const fn of need){
+        const f = document.querySelector(`[name="${fn}"]`);
+        if(!f || !f.value.trim()){ markBad(f); hit++; }
+      }
+      // Strict MM/YYYY for prev start
+      const ps = document.querySelector('[name="prevEmpStartDate"]');
+      if(ps && ps.value && !parseStrictMonthYear(ps.value)){ markBad(ps); hit++; }
+      if(ps && ps.value && isFutureMonthYear(ps.value)){ markBad(ps); hit++; }
+      if(hit){
+        showError('Please complete your previous employer (you indicated less than 2 years at your current job).', firstBad);
+        return false;
+      }
+    }
+  }
+
+  if(step===6){
+    // BUG-17: warn (non-blocking after ack) when liquid assets look shy of down payment on Purchase
+    if(form.loanPurpose.value==='Purchase'){
+      const parse = n => { const v = parseFloat((document.querySelector(`[name="${n}"]`)?.value||'').replace(/[^0-9.]/g,'')); return isNaN(v)?0:v; };
+      const liquid = parse('checkingBal')+parse('savingsBal')+parse('stocksBondsBal')+parse('giftFundsAmount');
+      const dp = parseFloat((document.getElementById('downPaymentInput').value||'').replace(/[^0-9.]/g,''))||0;
+      if(dp > 0 && liquid < dp && !window.__assetWarningShown){
+        window.__assetWarningShown = true;
+        showError('Heads up: your declared liquid assets ($'+Math.round(liquid).toLocaleString('en-US')+') appear less than your down payment ($'+Math.round(dp).toLocaleString('en-US')+'). Please double-check. Click Continue again to proceed.');
+        return false;
+      }
+    }
+  }
+
+  if(step===7){
+    // Validate all declarations are answered
+    const declGroups = document.querySelectorAll('.decl-toggle');
+    for(let i=0; i<declGroups.length; i++){
+      const answered = declGroups[i].querySelector('input[type="radio"]:checked');
+      if(!answered){
+        const container = declGroups[i].closest('.decl-item');
+        if(container && isVisible(container)){
+          try { container.scrollIntoView({behavior:'smooth', block:'center'}); } catch(_) {}
+        }
+        showError('Please answer all declaration questions before continuing.');
+        return false;
+      }
+    }
+  }
+
+  if(!valid){
+    if(firstBad && isVisible(firstBad)){
+      try { firstBad.focus({preventScroll:true}); } catch(_) {}
+    }
+    showError('Please fix the highlighted fields to continue.');
   }
   return valid;
 }
@@ -907,64 +1209,368 @@ async function uploadFilesToStorage(loanAppId){
   }
 }
 
-// Review
+// ===== Review =====
 function gv(name){const el=form.elements[name];return el?el.value||'—':'—';}
+// BUG-16: consistent currency formatting for review
+function fmtMoney(v){
+  if(v==null || v==='' || v==='—') return '—';
+  const raw = String(v).replace(/[^0-9.]/g,'');
+  const n = parseFloat(raw);
+  if(isNaN(n) || n===0) return String(v).startsWith('$') ? String(v) : ('$'+String(v));
+  return '$'+n.toLocaleString('en-US');
+}
+function moneyOrDash(name){
+  const v = gv(name);
+  return (v==='—' || v==='') ? '—' : fmtMoney(v);
+}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+
 function buildReview(){
   const ssnRaw = gv('ssn').replace(/\D/g,'');
   const ssnMasked = ssnRaw.length===9?'***-**-'+ssnRaw.slice(5):'—';
-  const sections = [
-    {title:'Loan Details',rows:(function(){
-      const isPurch = form.loanPurpose.value === 'Purchase';
-      const calcDisplay = document.getElementById('calcLoanAmountDisplay').value;
-      const rows = [['Purpose',gv('loanPurpose')],['Property Type',gv('propertyType')]];
-      if(isPurch){
-        rows.push(['Estimated Purchase Price', document.getElementById('purchasePriceInput').value||'—']);
-        rows.push(['Down Payment', document.getElementById('downPaymentInput').value||'—']);
-        rows.push(['Down Payment Source', gv('downPaymentSource')]);
-        rows.push(['Loan Amount (calculated)', calcDisplay||'—']);
-      } else {
-        rows.push(['Loan Amount Requested', gv('loanAmount')]);
+
+  const sections = [];
+
+  // --- Loan Details ---
+  sections.push({title:'Loan Details', rows:(function(){
+    const purpose = form.loanPurpose.value;
+    const isPurch = purpose === 'Purchase';
+    const isCashOut = purpose === 'Cash-Out Refi';
+    const calcDisplay = document.getElementById('calcLoanAmountDisplay').value;
+    const rows = [['Purpose', gv('loanPurpose')], ['Property Type', gv('propertyType')]];
+    if(isPurch){
+      rows.push(['Estimated Purchase Price', fmtMoney(document.getElementById('purchasePriceInput').value)]);
+      rows.push(['Down Payment', fmtMoney(document.getElementById('downPaymentInput').value)]);
+      rows.push(['Down Payment Source', gv('downPaymentSource')]);
+      rows.push(['Loan Amount (calculated)', calcDisplay || '—']);
+    } else {
+      rows.push(['Loan Amount Requested', moneyOrDash('loanAmount')]);
+      if(isCashOut){
+        rows.push(['Cash Out Amount', fmtMoney(document.getElementById('cashOutAmountInput').value)]);
       }
-      rows.push(['Credit Score', gv('estimatedCreditScore')]);
-      return rows;
-    })()},
-    {title:'Property',rows:[['Address',gv('propAddress')],['City/State/ZIP',gv('propCity')+', '+gv('propState')+' '+gv('propZip')],['County',gv('propCounty')],['Est. Value',gv('propValue')],['Use',gv('propUse')]]},
-    {title:'Borrower',rows:[['Name',gv('firstName')+' '+gv('lastName')],['Email',gv('email')],['Phone',gv('phone')],['DOB',gv('dob')],['SSN',ssnMasked],['Marital Status',gv('maritalStatus')],['Dependents',gv('dependents')]]},
-    {title:'Address',rows:[['Current',gv('curStreet')+', '+gv('curCity')+', '+gv('curState')+' '+gv('curZip')],['Own/Rent',gv('curOwnRent')],['Years',gv('curYears')]]},
-    {title:'Employment',rows:[['Employer',gv('empName')],['Title',gv('empTitle')],['Start Date',gv('empStartDate')],['Base/Salary',gv('baseIncome')||'$0'],['Overtime',gv('overtimeIncome')||'$0'],['Bonus',gv('bonusIncome')||'$0'],['Commission',gv('commissionIncome')||'$0'],['Other Income',gv('otherIncome')||'$0'],['Total Monthly',document.getElementById('totalIncomeLabel').textContent.replace('Total Monthly Income: ','')]]},
-    {title:'Assets',rows:[['Checking',gv('checkingBal')||'$0'],['Savings',gv('savingsBal')||'$0'],['Other RE',gv('otherRE')||'$0'],['Retirement',gv('retirementBal')||'$0'],['Stocks/Bonds',gv('stocksBondsBal')||'$0'],['Gift Funds',gv('giftFundsAmount')||'$0'],['Gift Source',gv('giftFundsSource')]]},
-    {title:'Monthly Debts',rows:[['Auto',gv('debtAuto')||'$0'],['Student',gv('debtStudent')||'$0'],['Credit Cards',gv('debtCC')||'$0'],['Other Mortgage',gv('debtMortgage')||'$0']]},
-    {title:'Documents',rows:[['Files uploaded',uploadedFiles.length+' file(s)']]}
-  ];
+    }
+    rows.push(['Credit Score', gv('estimatedCreditScore')]);
+    return rows;
+  })()});
+
+  // --- Property ---
+  sections.push({title:'Property', rows:[
+    ['Address', gv('propAddress')],
+    ['City/State/ZIP', gv('propCity')+', '+gv('propState')+' '+gv('propZip')],
+    ['County', gv('propCounty')],
+    ['Est. Value', moneyOrDash('propValue')],
+    ['Use', gv('propUse')]
+  ]});
+
+  // --- Borrower ---
+  sections.push({title:'Borrower', rows:[
+    ['Name', gv('firstName')+' '+gv('lastName')],
+    ['Email', gv('email')],
+    ['Phone', gv('phone')],
+    ['DOB', gv('dob')],
+    ['SSN', ssnMasked],
+    ['Marital Status', gv('maritalStatus')],
+    ['Dependents', gv('dependents')]
+  ]});
+
+  // --- Demographic Information (BUG-22: race and ethnicity are separate questions) ---
+  (function(){
+    const eth = (document.querySelector('[name="hmdaEthnicity"]:checked')||{}).value || '—';
+    const races = Array.from(document.querySelectorAll('[name="hmdaRace"]:checked')).map(el=>el.value);
+    sections.push({title:'Demographic Information', rows:[
+      ['Ethnicity', eth],
+      ['Race', races.length ? races.join(', ') : '—'],
+      ['Sex', gv('sex')]
+    ]});
+  })();
+
+  // --- Co-Borrower (BUG-6) ---
+  if(document.getElementById('addCoBorrower').checked){
+    const cbSsnRaw = (gv('coBorrSsn')||'').replace(/\D/g,'');
+    const cbSsnMasked = cbSsnRaw.length===9 ? '***-**-'+cbSsnRaw.slice(5) : '—';
+    sections.push({title:'Co-Borrower', rows:[
+      ['Name', gv('coBorrFirstName')+' '+gv('coBorrLastName')],
+      ['Email', gv('coBorrEmail')],
+      ['Phone', gv('coBorrPhone')],
+      ['DOB', gv('coBorrDob')],
+      ['SSN', cbSsnMasked],
+      ['Marital Status', gv('coBorrMarital')]
+    ]});
+  }
+
+  // --- Current Address ---
+  sections.push({title:'Current Address', rows:[
+    ['Street', gv('curStreet')],
+    ['City/State/ZIP', gv('curCity')+', '+gv('curState')+' '+gv('curZip')],
+    ['Own/Rent', gv('curOwnRent')],
+    ['Years at Address', gv('curYears')],
+    ['Monthly Housing Expense', moneyOrDash('monthlyHousingExpense')]
+  ]});
+
+  // --- Previous Address (BUG-6) ---
+  if(document.getElementById('prevAddrBlock').style.display !== 'none' && (gv('prevStreet')!=='—' || gv('prevCity')!=='—')){
+    sections.push({title:'Previous Address', rows:[
+      ['Street', gv('prevStreet')],
+      ['City/State/ZIP', gv('prevCity')+', '+gv('prevState')+' '+gv('prevZip')]
+    ]});
+  }
+
+  // --- Employment ---
+  sections.push({title:'Employment', rows:[
+    ['Employer', gv('empName')],
+    ['Title', gv('empTitle')],
+    ['Employer Phone', gv('empPhone')],
+    ['Start Date', gv('empStartDate')],
+    ['Years at Job', gv('empYears')],
+    ['Self-Employed', gv('selfEmployed')],
+    ['Base/Salary', moneyOrDash('baseIncome')],
+    ['Overtime', moneyOrDash('overtimeIncome')],
+    ['Bonus', moneyOrDash('bonusIncome')],
+    ['Commission', moneyOrDash('commissionIncome')],
+    ['Other Income', moneyOrDash('otherIncome')],
+    ['Other Income Source', gv('otherIncomeSource')],
+    ['Total Monthly', document.getElementById('totalIncomeLabel').textContent.replace('Total Monthly Income: ','')]
+  ]});
+
+  // --- Previous Employer (BUG-6) ---
+  if(document.getElementById('prevEmpBlock').style.display !== 'none' && (gv('prevEmpName')!=='—')){
+    sections.push({title:'Previous Employer', rows:[
+      ['Employer', gv('prevEmpName')],
+      ['Title', gv('prevEmpTitle')],
+      ['Start Date', gv('prevEmpStartDate')],
+      ['Monthly Income', moneyOrDash('prevEmpIncome')]
+    ]});
+  }
+
+  // --- Assets ---
+  sections.push({title:'Assets', rows:[
+    ['Checking', moneyOrDash('checkingBal')],
+    ['Savings', moneyOrDash('savingsBal')],
+    ['Other RE', moneyOrDash('otherRE')],
+    ['Retirement', moneyOrDash('retirementBal')],
+    ['Stocks/Bonds', moneyOrDash('stocksBondsBal')],
+    ['Gift Funds', moneyOrDash('giftFundsAmount')],
+    ['Gift Source', gv('giftFundsSource')]
+  ]});
+
+  // --- Monthly Debts ---
+  sections.push({title:'Monthly Debts', rows:[
+    ['Auto', moneyOrDash('debtAuto')],
+    ['Student', moneyOrDash('debtStudent')],
+    ['Credit Cards', moneyOrDash('debtCC')],
+    ['Other Mortgage', moneyOrDash('debtMortgage')]
+  ]});
+
+  // --- Declarations (BUG-6) ---
+  const declRows = declQuestions.map((q,i)=>{
+    const el = form.elements[`decl${i}`];
+    const ans = el && el.value ? el.value : 'Unanswered';
+    return [q, ans];
+  });
+  sections.push({title:'Declarations', rows: declRows});
+
+  // --- Documents ---
+  sections.push({title:'Documents', rows:[['Files uploaded', uploadedFiles.length+' file(s)']]});
+
   let html='';
   sections.forEach(s=>{
-    html+=`<div class="review-section"><h3>${s.title}</h3>`;
-    s.rows.forEach(r=>html+=`<div class="review-row"><span class="rlabel">${r[0]}</span><span class="rval">${r[1]}</span></div>`);
-    html+='</div>';
+    html += `<div class="review-section"><h3>${esc(s.title)}</h3>`;
+    s.rows.forEach(r => html += `<div class="review-row"><span class="rlabel">${esc(r[0])}</span><span class="rval">${esc(r[1])}</span></div>`);
+    html += '</div>';
   });
-  document.getElementById('reviewSummary').innerHTML=html;
+  document.getElementById('reviewSummary').innerHTML = html;
 }
 
-// Navigation
-btnNext.addEventListener('click',()=>{
-  if(!validateStep(currentStep)) return;
-  currentStep++;
-  updateUI();
+// ===== Autosave (BUG-5) =====
+const AUTOSAVE_KEY = 'apply.tct.v1';
+const SENSITIVE = new Set(['ssn','coBorrSsn','website']);
+let _saveTimer = null;
+let _restoreInProgress = false;
+function scheduleAutosave(){
+  if(_restoreInProgress) return;
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveState, 300);
+}
+function saveState(){
+  try{
+    const data = {};
+    new FormData(form).forEach((v,k)=>{ if(!SENSITIVE.has(k)) data[k] = v; });
+    // Multi-value collectors
+    const raceEls = document.querySelectorAll('[name="hmdaRace"]:checked');
+    data.__hmdaRace = Array.from(raceEls).map(el=>el.value);
+    // Declarations
+    const decls = {};
+    declQuestions.forEach((q,i)=>{
+      const el = form.elements[`decl${i}`];
+      if(el && el.value) decls['decl'+i] = el.value;
+    });
+    data.__declarations = decls;
+    data.__step = currentStep;
+    data.__addCoBorrower = document.getElementById('addCoBorrower').checked;
+    sessionStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
+  } catch(_) { /* storage disabled — ignore */ }
+}
+function restoreState(){
+  try{
+    const raw = sessionStorage.getItem(AUTOSAVE_KEY);
+    if(!raw) return;
+    _restoreInProgress = true;
+    const data = JSON.parse(raw);
+    Object.entries(data).forEach(([k,v])=>{
+      if(k.startsWith('__')) return;
+      const els = form.elements[k];
+      if(!els) return;
+      // Radio groups come back as RadioNodeList
+      if(els instanceof RadioNodeList){
+        Array.from(els).forEach(r => { if(r.value === v){ r.checked = true; r.dispatchEvent(new Event('change',{bubbles:true})); } });
+      } else if(els.type==='checkbox'){
+        els.checked = (v==='on' || v==='Yes' || v===true);
+      } else {
+        els.value = v;
+      }
+    });
+    // Race/Ethnicity
+    if(Array.isArray(data.__hmdaRace)){
+      data.__hmdaRace.forEach(val=>{
+        const box = document.querySelector(`[name="hmdaRace"][value="${val.replace(/"/g,'\\"')}"]`);
+        if(box) box.checked = true;
+      });
+    }
+    // Declarations
+    if(data.__declarations){
+      Object.entries(data.__declarations).forEach(([k,v])=>{
+        const inp = document.querySelector(`input[name="${k}"][value="${v}"]`);
+        if(inp){ inp.checked = true; inp.dispatchEvent(new Event('change',{bubbles:true})); }
+      });
+    }
+    // Co-borrower toggle
+    if(data.__addCoBorrower){
+      const cb = document.getElementById('addCoBorrower');
+      cb.checked = true;
+      cb.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+    // Trigger loan purpose UI to refresh
+    const lp = form.loanPurpose.value;
+    if(lp){ updatePurposeFields(lp); calcLoanAmount(); }
+    // Refresh income total
+    updateIncomeTotal();
+    // Refresh previous address visibility
+    const cy = parseInt(document.querySelector('[name="curYears"]')?.value);
+    if(!isNaN(cy)){
+      document.getElementById('prevAddrBlock').style.display = cy<2 ? 'block' : 'none';
+    }
+    // SUB-1 fix: SSN is intentionally not persisted. If the saved step is past
+    // Step 3 (where SSN is captured), the user must re-enter it before proceeding.
+    // Land them on Step 3 with an inline notice explaining what happened.
+    let savedStep = (typeof data.__step === 'number' && data.__step > 1 && data.__step <= totalSteps) ? data.__step : 1;
+    const ssnMissing = !document.querySelector('[name="ssn"]')?.value?.trim();
+    const cbSsnMissing = data.__addCoBorrower && !document.querySelector('[name="coBorrSsn"]')?.value?.trim();
+    if(savedStep > 3 && (ssnMissing || cbSsnMissing)){
+      savedStep = 3;
+      // NEW-5: notice the user their progress was restored
+      window.__pendingRestoreNotice = 'We restored your progress. Please re-enter your Social Security Number to continue — we don\'t save it for security.';
+    } else if(savedStep > 1){
+      window.__pendingRestoreNotice = 'We restored your saved progress. Please review before continuing.';
+    }
+    currentStep = savedStep;
+  } catch(_) { /* corrupt state — ignore */ }
+  finally { _restoreInProgress = false; }
+}
+
+// Warn on unload past Step 1 (BUG-5)
+window.addEventListener('beforeunload', e=>{
+  if(currentStep > 1 && !window.__submitted){
+    e.preventDefault();
+    e.returnValue = '';
+  }
 });
-btnBack.addEventListener('click',()=>{
-  if(currentStep>1){currentStep--;updateUI();}
+
+// ===== Navigation =====
+// BUG-1 residual: guard against rapid Back→Continue clicks racing the UI update.
+let _isTransitioning = false;
+function withTransitionGuard(fn){
+  return function(){
+    if(_isTransitioning) return;
+    _isTransitioning = true;
+    btnNext.disabled = true;
+    btnBack.disabled = true;
+    try { fn.apply(this, arguments); }
+    finally {
+      setTimeout(()=>{
+        _isTransitioning = false;
+        btnNext.disabled = false;
+        btnBack.disabled = false;
+      }, 250);
+    }
+  };
+}
+btnNext.addEventListener('click', withTransitionGuard(()=>{
+  if(!validateStep(currentStep)) return;
+  if(currentStep === 6) window.__assetWarningShown = false;
+  currentStep++;
+  saveState();
+  updateUI();
+}));
+btnBack.addEventListener('click', withTransitionGuard(()=>{
+  if(currentStep>1){ clearError(); currentStep--; saveState(); updateUI(); }
+}));
+
+// BUG-20: Enter key advances (Continue) when not inside a textarea
+form.addEventListener('keydown', e=>{
+  if(e.key !== 'Enter') return;
+  const t = e.target;
+  if(t && (t.tagName === 'TEXTAREA' || t.tagName === 'BUTTON')) return;
+  // Do not intercept Enter inside file input
+  if(t && t.type === 'file') return;
+  e.preventDefault();
+  if(currentStep === totalSteps){
+    btnSubmit.click();
+  } else {
+    btnNext.click();
+  }
 });
 
 // Submit
 btnSubmit.addEventListener('click',async()=>{
-  // Validate consent
-  if(!document.getElementById('consentCredit').checked||!document.getElementById('consentEsign').checked){alert('Please accept both consent checkboxes.');return;}
-  if(!document.getElementById('eSignature').value.trim()){alert('Please provide your electronic signature.');return;}
+  clearError();
+  // Validate consent (inline error, no alert)
+  if(!document.getElementById('consentCredit').checked || !document.getElementById('consentEsign').checked){
+    showError('Please accept both consent checkboxes to submit your application.', document.getElementById('consentCredit'));
+    return;
+  }
+  const sig = document.getElementById('eSignature');
+  if(!sig.value.trim()){
+    showError('Please provide your electronic signature (type your full legal name).', sig);
+    return;
+  }
+  // SUB-1 final gate: never submit without a full SSN (would silently create an SSN-less record)
+  const ssnDigits = (document.querySelector('[name="ssn"]')?.value||'').replace(/\D/g,'');
+  if(ssnDigits.length !== 9){
+    // Send them back to Step 3 to re-enter
+    currentStep = 3;
+    updateUI();
+    showError('Please re-enter your Social Security Number — we don\'t save it between sessions for security.', document.querySelector('[name="ssn"]'));
+    return;
+  }
+  if(document.getElementById('addCoBorrower').checked){
+    const cbSsnDigits = (document.querySelector('[name="coBorrSsn"]')?.value||'').replace(/\D/g,'');
+    if(cbSsnDigits.length !== 9){
+      currentStep = 3;
+      updateUI();
+      showError('Please re-enter the co-borrower Social Security Number.', document.querySelector('[name="coBorrSsn"]'));
+      return;
+    }
+  }
   // Honeypot
-  if(document.getElementById('ohnohoney').value){return;}
+  if(document.getElementById('ohnohoney').value){ return; }
   // Timestamp check
   const elapsed = Date.now()-parseInt(document.getElementById('formLoadTime').value);
-  if(elapsed<10000){alert('Please take a moment to review your application.');return;}
+  if(elapsed<10000){ showError('Please take a moment to review your application before submitting.'); return; }
+  // Turnstile must have produced a token — the server verifies it and will reject without one
+  if(!document.getElementById('cfTurnstileResponse').value){
+    showError('Please complete the "I\'m not a robot" verification below before submitting.');
+    return;
+  }
 
   // Gather data
   const data = {};
@@ -986,22 +1592,23 @@ btnSubmit.addEventListener('click',async()=>{
   btnSubmit.disabled=true;
   btnSubmit.innerHTML='<span class="spinner"></span>Submitting…';
 
-  // Generate ID client-side so we have it for file uploads without needing return=representation
-  const _clientLoanId = crypto.randomUUID();
-
   try{
-    const resp = await fetch('https://apuctuqlmykeemtcasji.supabase.co/rest/v1/loan_applications',{
+    // Submissions go through the submit-loan-application Edge Function, which
+    // verifies the Turnstile token server-side, generates the row id, and copies
+    // only an allowlist of borrower fields. The browser no longer writes to the
+    // loan_applications table directly.
+    const resp = await fetch('https://apuctuqlmykeemtcasji.supabase.co/functions/v1/submit-loan-application',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdWN0dXFsbXlrZWVtdGNhc2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3ODY5NjMsImV4cCI6MjA3NTM2Mjk2M30.Kyjei2lczrVkFJkOzI8ViLEc-qiOBPrv5TtT6G33MHU',
-        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdWN0dXFsbXlrZWVtdGNhc2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3ODY5NjMsImV4cCI6MjA3NTM2Mjk2M30.Kyjei2lczrVkFJkOzI8ViLEc-qiOBPrv5TtT6G33MHU',
-        'Prefer':'return=minimal'
+        'apikey':SUPABASE_KEY,
+        'Authorization':'Bearer '+SUPABASE_KEY
       },
       body:JSON.stringify((function(){
         // Gather race/ethnicity checkboxes
-        const raceEls = document.querySelectorAll('[name="raceEthnicity"]:checked');
+        const raceEls = document.querySelectorAll('[name="hmdaRace"]:checked');
         const raceArr = Array.from(raceEls).map(el=>el.value);
+        const ethnicityVal = (document.querySelector('[name="hmdaEthnicity"]:checked')||{}).value || '';
         // Gather co-borrower if enabled
         let coBorrower = null;
         if(document.getElementById('addCoBorrower').checked){
@@ -1015,7 +1622,6 @@ btnSubmit.addEventListener('click',async()=>{
         const parseCurrency = v=>{const n=parseFloat((v||'').replace(/[^0-9.]/g,''));return isNaN(n)?null:n;};
         const isPurch = data.loanPurpose === 'Purchase';
         return {
-          id:_clientLoanId,
           loan_purpose:data.loanPurpose||'',property_type:data.propertyType||'',
           property_address:data.propAddress||null,property_city:data.propCity||null,
           property_state:data.propState||null,property_zip:data.propZip||null,
@@ -1031,7 +1637,7 @@ btnSubmit.addEventListener('click',async()=>{
           employer:data.empName||'',job_title:data.empTitle||'',
           employer_phone:data.empPhone||'',
           employment_start_date:(function(d){if(!d||d.length!==7)return null;const p=d.split('/');return p.length===2?p[1]+'-'+p[0]+'-01':null;})(data.empStartDate),
-          years_employed:parseInt(data.empYears)||null,
+          years_employed:(data.empYears||'').toString().trim()||null,
           self_employed:data.selfEmployed==='Yes',
           base_income:parseCurrency(data.baseIncome),
           overtime_income:parseCurrency(data.overtimeIncome),
@@ -1063,19 +1669,34 @@ btnSubmit.addEventListener('click',async()=>{
           })(),
           down_payment:parseCurrency(data.downPayment),
           down_payment_source:data.downPaymentSource||'',
+          cash_out_amount:(data.loanPurpose==='Cash-Out Refi') ? parseCurrency(data.cashOutAmount) : null,
           estimated_credit_score:data.estimatedCreditScore||'',
-          race_ethnicity:raceArr.length?raceArr:null,
+          hmda_ethnicity:ethnicityVal||null,
+          hmda_race:raceArr.length?raceArr.join(', '):null,
+          hmda_sex:data.sex||null,
+          // kept populated for backward compatibility with existing readers
+          race_ethnicity:(function(){const c=raceArr.slice();if(ethnicityVal)c.push(ethnicityVal);return c.length?c:null;})(),
           sex:data.sex||'',
           co_borrower:coBorrower,
           checking_balance:parseCurrency(data.checkingBal),
           savings_balance:parseCurrency(data.savingsBal),
           other_real_estate:parseCurrency(data.otherRE),
+          previous_address:data.prevStreet||null,
           previous_city:data.prevCity||null,
           previous_state:data.prevState||null,
           previous_zip:data.prevZip||null,
           previous_employer:data.prevEmpName||null,
           previous_job_title:data.prevEmpTitle||null,
-          previous_years_employed:data.prevEmpYears||null,
+          previous_employment_start_date:(function(d){if(!d||d.length!==7)return null;const p=d.split('/');return p.length===2?p[1]+'-'+p[0]+'-01':null;})(data.prevEmpStartDate),
+          previous_years_employed:(function(){
+            // SUB-4: prev tenure = prev start → current start (or today if no current).
+            // Column is text — return string to match schema.
+            const prevStart = data.prevEmpStartDate;
+            const currStart = data.empStartDate;
+            if(!prevStart) return null;
+            const yrs = currStart ? calcYearsBetween(prevStart, currStart) : calcYearsFromStart(prevStart);
+            return yrs != null ? yrs.toFixed(1) : null;
+          })(),
           previous_monthly_income:parseCurrency(data.prevEmpIncome),
           retirement_balance:parseCurrency(data.retirementBal),
           stocks_bonds_balance:parseCurrency(data.stocksBondsBal),
@@ -1089,23 +1710,32 @@ btnSubmit.addEventListener('click',async()=>{
           documents:uploadedFiles.map(f=>({name:f.name,size:f.size,type:f.type})),
           credit_auth_consent:true,e_signature:data.eSignature||'',
           consent_timestamp:new Date().toISOString(),
-          loan_officer_id:'57f82d21-31e6-45b9-aa0d-c7b8764f464a',
           cf_turnstile_response:document.getElementById('cfTurnstileResponse').value||''
         };
       })())
     });
     delete data.ssn; delete data.coBorrSsn;
     if(!resp.ok){
-      const errBody = await resp.text();
-      console.error('Submit failed:',resp.status,errBody);
-      let userMsg = 'Something went wrong submitting your application. Please try again or call us at (760) 413-2724.';
-      alert(userMsg);
+      let serverMsg = '';
+      try { serverMsg = (await resp.json()).error || ''; } catch(_) {}
+      console.error('Submit failed:',resp.status,serverMsg);
+      let userMsg = serverMsg || 'Something went wrong submitting your application. Please try again or call us at (760) 413-2724.';
+      if(resp.status === 403){
+        // Turnstile token invalid or expired — reset the widget so they can retry
+        userMsg = 'Your security verification expired. Please complete the verification below and submit again.';
+        try {
+          document.getElementById('cfTurnstileResponse').value = '';
+          if(window.turnstile) window.turnstile.reset();
+        } catch(_) {}
+      }
+      showError(userMsg);
       btnSubmit.disabled=false;
       btnSubmit.innerHTML='Submit Application';
       return;
     }
-    // Use the client-generated UUID for file uploads
-    const loanAppId = _clientLoanId;
+    // Server generates the row id and returns it — needed for document uploads
+    let loanAppId = null;
+    try { loanAppId = (await resp.json()).id || null; } catch(_) {}
 
     // Upload documents if any
     if(uploadedFiles.length && loanAppId){
@@ -1113,22 +1743,34 @@ btnSubmit.addEventListener('click',async()=>{
       await uploadFilesToStorage(loanAppId);
       const failed = uploadedFiles.filter(f=>f._status==='failed');
       if(failed.length) console.warn(failed.length+' file(s) failed to upload');
+    } else if(uploadedFiles.length && !loanAppId){
+      console.warn('Application saved but no id returned — documents not uploaded');
     }
   }catch(e){
     console.error('Submit error:',e);
-    alert('Network error — please check your connection and try again, or call us at (760) 413-2724.');
+    showError('Network error — please check your connection and try again, or call us at (760) 413-2724.');
     btnSubmit.disabled=false;
     btnSubmit.innerHTML='Submit Application';
     return;
   }
 
+  // Success — clear autosave and disable unload guard
+  window.__submitted = true;
+  try { sessionStorage.removeItem(AUTOSAVE_KEY); } catch(_) {}
   form.style.display='none';
   document.querySelector('.progress-wrap').style.display='none';
   document.querySelector('.btn-row').style.display='none';
   document.getElementById('successScreen').style.display='block';
 });
 
+// Restore any saved state, then paint
+restoreState();
 updateUI();
+// NEW-5: surface a notice if state was restored (must run after updateUI paints)
+if(window.__pendingRestoreNotice){
+  showError(window.__pendingRestoreNotice);
+  delete window.__pendingRestoreNotice;
+}
 })();
 </script>
 <script>
