@@ -2,44 +2,38 @@
 
 ## Stack & repo map
 
-Static HTML/CSS/JS mortgage loan application hosted on Netlify (site: enchanting-semolina-788344). No build step — files deploy as-is. Backend is Supabase (project: apuctuqlmykeemtcasji) with PostgREST API, storage, and database triggers.
+Static HTML/CSS/JS mortgage loan application hosted on Netlify (site: enchanting-semolina-788344). No build step — the `site/` folder deploys as-is, and nothing outside it is published. Backend is Supabase (project: apuctuqlmykeemtcasji): the `submit-loan-application` edge function (source in SuperdaddC/RealtorCRM), storage, and database triggers.
 
-- `index.html` — 9-step multi-page form, submits directly to Supabase PostgREST using anon key. Collects borrower PII (SSN last-4, DOB, income, assets, employment), property info, declarations, and supporting documents.
-- `upload.html` — borrower document upload checklist, accessed via token-based URL from confirmation email
-- `mismo-export.js` — MISMO 3.4 XML export for Fannie Mae Desktop Underwriter (DU) submission
-- `netlify.toml` — security headers (HSTS, CSP, X-Frame-Options), build config
-- `fonts/` — self-hosted Inter woff2 files (no external Google Fonts dependency)
+- `site/index.html` — multi-step form. POSTs to the `submit-loan-application` edge function, which verifies Turnstile, allowlists every field and generates the row id. Collects borrower PII (SSN last-4, DOB, income, assets, employment), property info, current-URLA (1/2021) declarations, military service and demographics for borrower and co-borrower, and supporting documents.
+- `site/upload.html` — borrower document upload checklist, accessed via token-based URL from confirmation email
+- `site/fonts/` — self-hosted Inter woff2 files (no external Google Fonts dependency)
+- `netlify.toml` — `publish = "site"`, security headers (HSTS, CSP, X-Frame-Options)
+- MISMO 3.4 / ULAD export lives in SuperdaddC/RealtorCRM `tooling/mismo` (schema-validated); the old `mismo-export.js` here was removed
 - `COMPLIANCE.md` — regulatory reference covering 32 CA/federal laws applicable to online loan applications
 - `DEPLOY.md` — deploy flow, staging/prod URLs, rollback procedures
 
-**Database triggers on loan_applications (INSERT):**
-1. `validate_loan_application` (BEFORE) — field validation, rate limiting, Turnstile server-side verification via Vault secret + http extension
-2. `fn_client_on_loan_application` (BEFORE) — deduplicate/create clients record
-3. `fn_lead_on_loan_application` (AFTER) — upsert into leads table
-4. `fn_log_web_app_submission` (AFTER) — write to loan_activity_log
-5. `fn_drip_auto_switch_on_loan_app` (AFTER) — switch drip campaigns
-6. `notify_loan_application` (AFTER) — HTTP webhook for confirmation + notification emails
-7. `sync_loan_app_to_person_activity` (AFTER) — person activity sync
-
-All AFTER triggers are SECURITY DEFINER to work with anon role inserts.
+**Database triggers on loan_applications.** Do not trust a copy of this list; regenerate it with
+`select tgname, proname from pg_trigger t join pg_proc p on p.oid = t.tgfoid where tgrelid = 'public.loan_applications'::regclass and not tgisinternal`.
+As of 2026-09-21 the INSERT path is: `validate_loan_application` (BEFORE; field checks, rate limit; re-verifies
+Turnstile only for non-service_role callers, because the edge function already spent the single-use token),
+`fn_client_on_loan_application` (BEFORE; links clients/people, fill-only), then AFTER: `fn_lead_on_loan_application`,
+`fn_log_loan_app_interaction`, `fn_log_web_app_submission`, `fn_notify_new_loan_application` (queues Michael's
+Outlook task and notification email), `sync_loan_app_to_person_activity`, `audit_domain_write`.
 
 ## Commands
 
-- Deploy staging: `bash ./deploy.sh staging` (Git Bash, requires NETLIFY_AUTH_TOKEN in env)
-- Deploy prod: `bash ./deploy.sh prod` (Git Bash)
+- Deploy staging: `bash ./deploy.sh staging` (Git Bash)
+- Deploy prod: `bash ./deploy.sh prod` (Git Bash). Publishes `site/` only; never deploy with `--dir=.`
 - No build step, no test suite, no backend server
 - DB changes: Supabase SQL Editor at https://supabase.com/dashboard/project/apuctuqlmykeemtcasji/sql/new
-- Turnstile secret: stored in Supabase Vault (name: `turnstile_secret`)
+- Turnstile secret: the `TURNSTILE_SECRET` edge-function secret (verification at the edge) and Supabase Vault `turnstile_secret` (the trigger's check for non-service_role inserts)
 
 ## Must not break
 
-- Form submission → Supabase insert (anon role, RLS insert-only, no SELECT for anon)
-- `Prefer: return=minimal` on the POST — anon has no SELECT policy, so `return=representation` causes RLS violation
-- File uploads after submit depend on client-generated UUID (`_clientLoanId`) sent as the row `id`
-- Turnstile verification happens server-side in the `validate_loan_application` DB trigger, not client-side
-- All 6 AFTER INSERT triggers must be SECURITY DEFINER or they fail on anon inserts
-- Confirmation emails fire via pg_net webhook in `notify_loan_application` trigger
-- `cf_turnstile_response` is set to NULL by the trigger after verification — never persisted
+- Form submission → `submit-loan-application` edge function → insert as service_role. A field the function does not allowlist is dropped, so a new form field needs a matching server change first
+- File uploads after submit use the application `id` the function returns
+- Turnstile verification happens server-side (edge function), not client-side; a token is single-use
+- `cf_turnstile_response` is set to NULL by the trigger — never persisted
 - The `purchase_price` column was added manually; anon has INSERT grant on it
 - Upload.html token is read from URL then stripped via `history.replaceState` — do not re-add token to URL
 
@@ -53,7 +47,7 @@ All AFTER triggers are SECURITY DEFINER to work with anon role inserts.
 - Changing how SSN, DOB, or other PII is collected, transmitted, or stored
 - Modifying compliance disclosures (privacy policy, TOS, Equal Housing, NMLS/DRE numbers)
 - Broad refactors or dependency additions
-- File moves affecting deploy paths (Netlify serves from repo root)
+- File moves affecting deploy paths (Netlify serves `site/`)
 
 ## Preferred patterns
 
@@ -75,5 +69,4 @@ All AFTER triggers are SECURITY DEFINER to work with anon role inserts.
 - Full SSN is collected client-side but only last-4 is transmitted — full value exists in browser memory temporarily. Moving to a tokenization vault (VGS/Basis Theory) is a future enhancement.
 - `.netlify/netlify.toml` has a local machine path in `publish` — artifact of running `netlify deploy` from different machines, not harmful
 - The `page_views` INSERT fires on every load with no bot protection — low priority but could be abused for log spam
-- Supabase anon key is in client HTML — acceptable with RLS but a serverless function proxy would be more secure (future enhancement)
 - upload.html uses anon key to query `loan_needs_list` and `loan_applications` — RLS must restrict reads to token-matched rows only

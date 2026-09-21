@@ -5,7 +5,14 @@
 - **Branch:** `main`
 - **Repo:** SuperdaddC/loan-application
 - **Hosting:** Netlify (site: enchanting-semolina-788344)
-- **Deploy method:** `netlify deploy --prod` via CLI (Netlify git-builds disabled — private repo requires GitHub App linking)
+- **Deploy method:** **merging to `main` publishes.** The Netlify site is linked to this repo (GitHub App,
+  `stop_builds: false`), so every push to `main` builds and goes live within seconds, and every pull
+  request gets a deploy preview. `./deploy.sh prod` (Netlify CLI) also publishes, from your working tree.
+  On 2026-09-21 merging only the first of three stacked PRs published a half-finished `main` for two
+  minutes: land a stack with ONE merge into `main`, or retarget each PR to `main` and merge in order.
+- **Published folder:** `site/` only. The repo is public on GitHub, but the site must not serve the
+  repo root: until 2026-09-21 a `--dir=.` deploy published WISP.md, INCIDENT_RESPONSE.md, COMPLIANCE.md
+  and shell scripts at apply.thecolyerteam.com. Never deploy with `--dir=.`.
 
 ## Staging
 - **URL:** https://staging--enchanting-semolina-788344.netlify.app
@@ -15,10 +22,8 @@
 ## Quick Deploy
 
 ```bash
-# Token must be set in your shell env — do NOT commit it.
-# Add to ~/.bashrc (or ~/.zshrc):
-#   export NETLIFY_AUTH_TOKEN=<your-personal-access-token>
-# Create a token at: https://app.netlify.com/user/applications#personal-access-tokens
+# Auth: NETLIFY_AUTH_TOKEN if set, otherwise the CLI's stored `netlify login`. Never commit a token.
+# If a stale token is exported in your shell, `unset NETLIFY_AUTH_TOKEN` first.
 
 # Deploy to staging
 ./deploy.sh staging
@@ -36,7 +41,8 @@
 5. Test on staging URL end-to-end (load app, fill all steps, submit, verify in Supabase)
 6. Once approved, merge `staging` → `main`
 7. Deploy production: `git checkout main && ./deploy.sh prod`
-8. Verify production
+8. Verify production: fetch https://apply.thecolyerteam.com/ and compare it with `site/index.html`
+   at the deployed commit, and confirm `/WISP.md` returns 404
 
 ## Rollback
 
@@ -56,11 +62,8 @@
 - [ ] DB migrations applied before frontend deploy?
 - [ ] Checked Netlify deploy log for errors?
 
-## Future: Enable Auto-Deploys
+## Auto-deploys are ON
 
-To enable automatic deploys on git push (no manual CLI step), connect the Netlify GitHub App:
-1. Go to https://app.netlify.com/projects/enchanting-semolina-788344/configuration/deploys
-2. Under "Build settings", click "Link to Git provider"
-3. Authorize the Netlify GitHub App for the SuperdaddC account
-4. Select the loan-application repo, branch: main
-5. Once linked, set `stop_builds: false` and pushes will auto-deploy
+The site is linked to SuperdaddC/loan-application, branch `main`. To stop merges from publishing
+(for example during a risky change), lock the current production deploy in the Netlify dashboard
+(Deploys -> the published deploy -> "Lock to stop auto publishing") and unlock it afterwards.

@@ -72,7 +72,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .decl-toggle{display:flex;gap:8px}
 .decl-toggle label{padding:6px 16px;border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
 .decl-toggle label:hover{border-color:var(--gray-400)}
-.decl-toggle input{display:none}
+.decl-toggle{position:relative}
+/* Visually hidden, NOT display:none - display:none took every declaration out of the tab order,
+   so a keyboard user could not answer them at all (ticket #306). */
+.decl-toggle input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.decl-toggle input:focus-visible+label{outline:2px solid var(--red);outline-offset:2px}
 .decl-toggle input:checked+label,.decl-toggle label.sel{background:var(--red);color:#fff;border-color:var(--red)}
 
 /* Upload zone */
@@ -153,6 +157,25 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .group-error.show{display:block}
 .option-card:focus-within{outline:2px solid var(--red);outline-offset:2px}
 .step:focus{outline:none}
+/* URLA Sections 5, 7, 8 (ticket #306) */
+.urla-block [hidden]{display:none!important}
+.urla-block{margin-bottom:28px}
+.urla-who{font-size:1rem;font-weight:700;color:var(--gray-900);border-left:4px solid var(--red);padding-left:10px;margin:18px 0 8px}
+.urla-h{font-size:.95rem;font-weight:700;color:var(--gray-900);margin:22px 0 2px}
+.urla-intro{font-size:.8rem;color:var(--gray-500);margin:0 0 8px}
+.urla-sub-h{font-size:.78rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.03em;margin:14px 0 2px}
+.urla-sub{padding-left:22px}
+.urla-stack{flex-direction:column;align-items:flex-start;gap:8px}
+.urla-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin:4px 0 8px}
+.urla-checks.urla-one{grid-template-columns:1fr}
+.urla-nest{margin:0 0 10px 22px}
+.urla-text input,.urla-date input{width:100%}
+.urla-disclosure{font-size:.75rem;line-height:1.55;color:var(--gray-600);background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 12px;margin:6px 0 12px}
+.urla-demo-h{font-size:.82rem;font-weight:700;color:var(--gray-700);margin:12px 0 4px}
+.urla-fieldset{border:0;padding:0;margin:4px 0 16px}
+.urla-fieldset legend{font-size:.8rem;font-weight:600;color:var(--gray-700);margin-bottom:6px;padding:0}
+.urla-missing{background:var(--red-light);border-radius:6px;padding-left:8px;padding-right:8px}
+@media(max-width:600px){.decl-item{flex-direction:column;align-items:flex-start;gap:8px}.decl-toggle label{min-height:44px;min-width:64px;display:inline-flex;align-items:center;justify-content:center}.urla-checks .check-row{min-height:36px;align-items:center}.urla-checks{grid-template-columns:1fr}.urla-sub{padding-left:12px}.urla-nest{margin-left:12px}}
 </style>
 </head>
 <body>
@@ -257,32 +280,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="form-group"><label for="f-ssn">Social Security Number <span class="req">*</span></label><input id="f-ssn" type="password" name="ssn" maxlength="11" placeholder="XXX-XX-XXXX" autocomplete="off" inputmode="numeric" aria-describedby="err-ssn"><span class="error-msg" id="err-ssn" role="alert">9 digits required</span></div>
   </div>
 
-  <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:16px 0 4px">Demographic Information (HMDA)</p>
-  <p style="font-size:.75rem;color:var(--gray-500);margin:0 0 12px;line-height:1.5">The law requires we ask for this information to monitor compliance with equal credit opportunity and fair housing laws. You are not required to provide it.</p>
-
-  <p style="font-size:.8rem;font-weight:600;color:var(--gray-600);margin:0 0 8px">Ethnicity</p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px" id="hmdaEthnicityGroup">
-    <label class="check-row" style="margin:0"><input type="radio" name="hmdaEthnicity" value="Hispanic or Latino" style="accent-color:var(--red)"> Hispanic or Latino</label>
-    <label class="check-row" style="margin:0"><input type="radio" name="hmdaEthnicity" value="Not Hispanic or Latino" style="accent-color:var(--red)"> Not Hispanic or Latino</label>
-    <label class="check-row" style="margin:0"><input type="radio" name="hmdaEthnicity" value="I do not wish to provide" style="accent-color:var(--red)"> I do not wish to provide</label>
-  </div>
-
-  <p style="font-size:.8rem;font-weight:600;color:var(--gray-600);margin:0 0 8px">Race <span style="font-weight:400;font-style:italic;color:var(--gray-400)">(select all that apply)</span></p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px" id="hmdaRaceGroup">
-    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="American Indian or Alaska Native"> American Indian or Alaska Native</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="Asian"> Asian</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="Black or African American"> Black or African American</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="Native Hawaiian or Other Pacific Islander"> Native Hawaiian or Other Pacific Islander</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="White"> White</label>
-    <label class="check-row" style="margin:0"><input type="checkbox" name="hmdaRace" value="I do not wish to provide"> I do not wish to provide</label>
-  </div>
-
-  <p style="font-size:.85rem;font-weight:600;color:var(--gray-600);margin:0 0 10px">Sex</p>
-  <div style="display:flex;gap:16px;margin-bottom:16px">
-    <label class="check-row" style="margin:0"><input type="radio" name="sex" value="Male" style="accent-color:var(--red)"> Male</label>
-    <label class="check-row" style="margin:0"><input type="radio" name="sex" value="Female" style="accent-color:var(--red)"> Female</label>
-    <label class="check-row" style="margin:0"><input type="radio" name="sex" value="I do not wish to provide" style="accent-color:var(--red)"> I do not wish to provide</label>
-  </div>
+  <fieldset class="urla-fieldset" id="citizenshipGroup"><legend>Citizenship <span class="req">*</span></legend>
+    <div class="urla-checks urla-one">
+      <label class="check-row" style="margin:0"><input type="radio" name="citizenship" value="USCitizen" style="accent-color:var(--red)"> U.S. Citizen</label>
+      <label class="check-row" style="margin:0"><input type="radio" name="citizenship" value="PermanentResidentAlien" style="accent-color:var(--red)"> Permanent Resident Alien</label>
+      <label class="check-row" style="margin:0"><input type="radio" name="citizenship" value="NonPermanentResidentAlien" style="accent-color:var(--red)"> Non-Permanent Resident Alien</label>
+    </div>
+    <span class="group-error" id="err-citizenship" role="alert" style="margin-top:0">Please select citizenship</span>
+  </fieldset>
 
   <div style="margin-top:16px">
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--gray-700)">
@@ -304,6 +309,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="form-row single">
         <div class="form-group"><label for="f-coBorrMarital">Co-Borrower Marital Status</label><select id="f-coBorrMarital" name="coBorrMarital"><option value="">Select…</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></div>
       </div>
+      <fieldset class="urla-fieldset" id="coBorrCitizenshipGroup"><legend>Co-Borrower Citizenship <span class="req">*</span></legend>
+        <div class="urla-checks urla-one">
+          <label class="check-row" style="margin:0"><input type="radio" name="coBorrCitizenship" value="USCitizen" style="accent-color:var(--red)"> U.S. Citizen</label>
+          <label class="check-row" style="margin:0"><input type="radio" name="coBorrCitizenship" value="PermanentResidentAlien" style="accent-color:var(--red)"> Permanent Resident Alien</label>
+          <label class="check-row" style="margin:0"><input type="radio" name="coBorrCitizenship" value="NonPermanentResidentAlien" style="accent-color:var(--red)"> Non-Permanent Resident Alien</label>
+        </div>
+        <span class="group-error" id="err-coBorrCitizenship" role="alert" style="margin-top:0">Please select citizenship</span>
+      </fieldset>
     </div>
   </div>
 </div>
@@ -414,7 +427,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 <!-- Step 7: Declarations -->
 <div class="step" data-step="7">
-  <div id="declarations"></div>
+  <div id="urlaRoot"><div id="urlaBorrower"></div><div id="urlaCoBorrower" hidden></div></div>
 </div>
 
 <!-- Step 8: Document Upload -->
@@ -542,35 +555,305 @@ document.querySelectorAll('select[name$="State"]').forEach(sel=>{
   states.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o)});
 });
 
-// Declarations
-const declQuestions = [
-  'Are there any outstanding judgments against you?',
-  'Have you been declared bankrupt within the past 7 years?',
-  'Have you had property foreclosed upon in the last 7 years?',
-  'Are you a party to a lawsuit?',
-  'Have you directly or indirectly been obligated on any loan which resulted in foreclosure, transfer of title in lieu of foreclosure, or judgment?',
-  'Are you presently delinquent or in default on any Federal debt?',
-  'Are you obligated to pay alimony, child support, or separate maintenance?',
-  'Is any part of the down payment borrowed?',
-  'Are you a co-maker or endorser on a note?',
-  'Are you a US citizen?',
-  'Are you a permanent resident alien?',
-  'Do you intend to occupy the property as your primary residence?'
+// ===== URLA per-borrower sections: 5 Declarations, 7 Military, 8 Demographics (ticket #306) =====
+// Wording is VERBATIM from Freddie Mac Form 65 / Fannie Mae Form 1003, effective 1/2021
+// (sf.freddiemac.com numbered borrower-information template). Do not paraphrase it: this is a
+// regulated form. Each key is the MISMO/ULAD element the answer maps to, so the stored record,
+// the MISMO export and the notification email share one vocabulary.
+const URLA_5A = [
+  { k: 'IntentToOccupyType', l: 'A', t: 'yn', q: 'Will you occupy the property as your primary residence?' },
+  { k: 'HomeownerPastThreeYearsType', t: 'yn', parent: 'IntentToOccupyType',
+    q: 'If YES, have you had an ownership interest in another property in the last three years?' },
+  { k: 'PriorPropertyUsageType', t: 'choice', parent: 'HomeownerPastThreeYearsType',
+    q: '(1) What type of property did you own: primary residence (PR), FHA secondary residence (SR), second home (SH), or investment property (IP)?',
+    opts: [['PrimaryResidence', 'Primary residence (PR)'], ['FHASecondaryResidence', 'FHA secondary residence (SR)'],
+           ['SecondHome', 'Second home (SH)'], ['Investment', 'Investment property (IP)']] },
+  { k: 'PriorPropertyTitleType', t: 'choice', parent: 'HomeownerPastThreeYearsType',
+    q: '(2) How did you hold title to the property: by yourself (S), jointly with your spouse (SP), or jointly with another person (O)?',
+    opts: [['Sole', 'By yourself (S)'], ['JointWithSpouse', 'Jointly with your spouse (SP)'],
+           ['JointWithOtherThanSpouse', 'Jointly with another person (O)']] },
+  { k: 'SpecialBorrowerSellerRelationshipIndicator', l: 'B', t: 'yn', purchaseOnly: true,
+    q: 'If this is a Purchase Transaction: Do you have a family relationship or business affiliation with the seller of the property?' },
+  { k: 'UndisclosedBorrowedFundsIndicator', l: 'C', t: 'yn',
+    q: 'Are you borrowing any money for this real estate transaction (e.g., money for your closing costs or down payment) or obtaining any money from another party, such as the seller or realtor, that you have not disclosed on this loan application?' },
+  { k: 'UndisclosedBorrowedFundsAmount', t: 'amount', parent: 'UndisclosedBorrowedFundsIndicator',
+    q: 'If YES, what is the amount of this money?' },
+  { k: 'UndisclosedMortgageApplicationIndicator', l: 'D', sub: '1.', t: 'yn',
+    q: 'Have you or will you be applying for a mortgage loan on another property (not the property securing this loan) on or before closing this transaction that is not disclosed on this loan application?' },
+  { k: 'UndisclosedCreditApplicationIndicator', sub: '2.', t: 'yn',
+    q: 'Have you or will you be applying for any new credit (e.g., installment loan, credit card, etc.) on or before closing this loan that is not disclosed on this application?' },
+  { k: 'PropertyProposedCleanEnergyLienIndicator', l: 'E', t: 'yn',
+    q: 'Will this property be subject to a lien that could take priority over the first mortgage lien, such as a clean energy lien paid through your property taxes (e.g., the Property Assessed Clean Energy Program)?' },
 ];
-const declContainer = document.getElementById('declarations');
-declQuestions.forEach((q,i)=>{
-  declContainer.innerHTML += `<div class="decl-item"><span class="decl-text">${q}</span><div class="decl-toggle"><input type="radio" name="decl${i}" id="decl${i}y" value="Yes"><label for="decl${i}y">Yes</label><input type="radio" name="decl${i}" id="decl${i}n" value="No"><label for="decl${i}n">No</label></div></div>`;
-});
-// Style declaration toggles
-document.querySelectorAll('.decl-toggle input').forEach(inp=>{
-  inp.addEventListener('change',()=>{
-    inp.closest('.decl-toggle').querySelectorAll('label').forEach(l=>l.classList.remove('sel'));
-    if(inp.checked) inp.nextElementSibling?.classList.add('sel') || inp.previousElementSibling?.classList.add('sel');
-    // Fix: label is the next sibling for radio
-    const lbl = document.querySelector(`label[for="${inp.id}"]`);
-    if(lbl) {inp.closest('.decl-toggle').querySelectorAll('label').forEach(l=>l.classList.remove('sel')); lbl.classList.add('sel');}
+const URLA_5B = [
+  { k: 'UndisclosedComakerOfNoteIndicator', l: 'F', t: 'yn', q: 'Are you a co-signer or guarantor on any debt or loan that is not disclosed on this application?' },
+  { k: 'OutstandingJudgmentsIndicator', l: 'G', t: 'yn', q: 'Are there any outstanding judgments against you?' },
+  { k: 'PresentlyDelinquentIndicator', l: 'H', t: 'yn', q: 'Are you currently delinquent or in default on a Federal debt?' },
+  { k: 'PartyToLawsuitIndicator', l: 'I', t: 'yn', q: 'Are you a party to a lawsuit in which you potentially have any personal financial liability?' },
+  { k: 'PriorPropertyDeedInLieuConveyedIndicator', l: 'J', t: 'yn', q: 'Have you conveyed title to any property in lieu of foreclosure in the past 7 years?' },
+  { k: 'PriorPropertyShortSaleCompletedIndicator', l: 'K', t: 'yn',
+    q: 'Within the past 7 years, have you completed a pre-foreclosure sale or short sale, whereby the property was sold to a third party and the Lender agreed to accept less than the outstanding mortgage balance due?' },
+  { k: 'PriorPropertyForeclosureCompletedIndicator', l: 'L', t: 'yn', q: 'Have you had property foreclosed upon in the last 7 years?' },
+  { k: 'BankruptcyIndicator', l: 'M', t: 'yn', q: 'Have you declared bankruptcy within the past 7 years?' },
+  { k: 'BankruptcyChapterType', t: 'multi', parent: 'BankruptcyIndicator', q: 'If YES, identify the type(s) of bankruptcy:',
+    opts: [['ChapterSeven', 'Chapter 7'], ['ChapterEleven', 'Chapter 11'], ['ChapterTwelve', 'Chapter 12'], ['ChapterThirteen', 'Chapter 13']] },
+];
+const URLA_ALL = URLA_5A.concat(URLA_5B);
+// The adverse questions: a YES here is what an underwriter needs to see first.
+const URLA_ADVERSE = new Set(['SpecialBorrowerSellerRelationshipIndicator', 'UndisclosedBorrowedFundsIndicator',
+  'UndisclosedMortgageApplicationIndicator', 'UndisclosedCreditApplicationIndicator', 'PropertyProposedCleanEnergyLienIndicator',
+  'UndisclosedComakerOfNoteIndicator', 'OutstandingJudgmentsIndicator', 'PresentlyDelinquentIndicator', 'PartyToLawsuitIndicator',
+  'PriorPropertyDeedInLieuConveyedIndicator', 'PriorPropertyShortSaleCompletedIndicator',
+  'PriorPropertyForeclosureCompletedIndicator', 'BankruptcyIndicator']);
+
+const URLA_MILITARY_Q = 'Military Service – Did you (or your deceased spouse) ever serve, or are you currently serving, in the United States Armed Forces?';
+const URLA_MILITARY_OPTS = [
+  ['ActiveDuty', 'Currently serving on active duty with projected expiration date of service/tour'],
+  ['Veteran', 'Currently retired, discharged, or separated from service'],
+  ['ReserveNationalGuardNeverActivated', 'Only period of service was as a non-activated member of the Reserve or National Guard'],
+  ['SurvivingSpouse', 'Surviving spouse'],
+];
+const URLA_DEMO_DISCLOSURE = 'The purpose of collecting this information is to help ensure that all applicants are treated fairly and that the housing needs of communities and neighborhoods are being fulfilled. For residential mortgage lending, Federal law requires that we ask applicants for their demographic information (ethnicity, sex, and race) in order to monitor our compliance with equal credit opportunity, fair housing, and home mortgage disclosure laws. You are not required to provide this information, but are encouraged to do so. You may select one or more designations for “Ethnicity” and one or more designations for “Race.” The law provides that we may not discriminate on the basis of this information, or on whether you choose to provide it. However, if you choose not to provide the information and you have made this application in person, Federal regulations require us to note your ethnicity, sex, and race on the basis of visual observation or surname. The law also provides that we may not discriminate on the basis of age or marital status information you provide in this application. If you do not wish to provide some or all of this information, please check below.';
+const URLA_REFUSE = 'I do not wish to provide this information';
+const URLA_ETH = [['HispanicOrLatino', 'Hispanic or Latino'], ['NotHispanicOrLatino', 'Not Hispanic or Latino'], ['Refused', URLA_REFUSE]];
+const URLA_ETH_ORIGIN = [['Mexican', 'Mexican'], ['PuertoRican', 'Puerto Rican'], ['Cuban', 'Cuban'], ['Other', 'Other Hispanic or Latino – Print origin:']];
+const URLA_SEX = [['Female', 'Female'], ['Male', 'Male'], ['Refused', URLA_REFUSE]];
+const URLA_RACE = [
+  ['AmericanIndianOrAlaskaNative', 'American Indian or Alaska Native – Print name of enrolled or principal tribe:'],
+  ['Asian', 'Asian'], ['BlackOrAfricanAmerican', 'Black or African American'],
+  ['NativeHawaiianOrOtherPacificIslander', 'Native Hawaiian or Other Pacific Islander'], ['White', 'White'], ['Refused', URLA_REFUSE]];
+const URLA_ASIAN = [['AsianIndian', 'Asian Indian'], ['Chinese', 'Chinese'], ['Filipino', 'Filipino'], ['Japanese', 'Japanese'],
+  ['Korean', 'Korean'], ['Vietnamese', 'Vietnamese'], ['OtherAsian', 'Other Asian – Print race:']];
+const URLA_PI = [['NativeHawaiian', 'Native Hawaiian'], ['GuamanianOrChamorro', 'Guamanian or Chamorro'], ['Samoan', 'Samoan'],
+  ['OtherPacificIslander', 'Other Pacific Islander – Print race:']];
+
+const uesc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+function urlaYesNo(p, d) {
+  const n = p + '_' + d.k;
+  return `<div class="decl-toggle"><input type="radio" name="${n}" id="${n}_n" value="No"><label for="${n}_n">No</label>` +
+         `<input type="radio" name="${n}" id="${n}_y" value="Yes"><label for="${n}_y">Yes</label></div>`;
+}
+function urlaChecks(name, opts, cls) {
+  return `<div class="urla-checks${cls ? ' ' + cls : ''}">` + opts.map(([v, lab]) =>
+    `<label class="check-row" style="margin:0"><input type="checkbox" name="${name}" value="${v}"> ${uesc(lab)}</label>`).join('') + '</div>';
+}
+function urlaQuestion(p, d) {
+  const n = p + '_' + d.k;
+  const attrs = [`data-q="${d.k}"`];
+  if (d.parent) attrs.push(`data-parent="${p}_${d.parent}"`, 'hidden');
+  if (d.purchaseOnly) attrs.push('data-purchase-only="1"');
+  const lead = (d.l ? `<strong>${d.l}.</strong> ` : '') + (d.sub ? `${d.sub} ` : '');
+  let control = '';
+  if (d.t === 'yn') control = urlaYesNo(p, d);
+  else if (d.t === 'choice') control = '<div class="urla-checks urla-one">' + d.opts.map(([v, lab]) =>
+    `<label class="check-row" style="margin:0"><input type="radio" name="${n}" value="${v}" style="accent-color:var(--red)"> ${uesc(lab)}</label>`).join('') + '</div>';
+  else if (d.t === 'multi') control = urlaChecks(n, d.opts);
+  else if (d.t === 'amount') control = `<div class="form-group" style="max-width:220px"><input type="text" name="${n}" id="${n}" inputmode="numeric" placeholder="$" autocomplete="off" aria-label="${uesc(d.q)}"></div>`;
+  const inline = d.t === 'yn';
+  return `<div class="decl-item urla-q${d.parent ? ' urla-sub' : ''}${inline ? '' : ' urla-stack'}" ${attrs.join(' ')}>` +
+         `<span class="decl-text">${lead}${uesc(d.q)}</span>${control}</div>`;
+}
+
+function renderUrlaBlock(p, heading) {
+  const sectionHead = (t, s) => `<p class="urla-h">${t}</p><p class="urla-intro">${s}</p>`;
+  const mil = p + '_military';
+  return `<div class="urla-block" data-urla="${p}">` +
+    (heading ? `<div class="urla-who">${uesc(heading)}</div>` : '') +
+    sectionHead('Section 5: Declarations', 'This section asks you specific questions about the property, your funding, and your past financial history.') +
+    `<p class="urla-sub-h">5a. About this Property and Your Money for this Loan</p>` + URLA_5A.map(d => urlaQuestion(p, d)).join('') +
+    `<p class="urla-sub-h">5b. About Your Finances</p>` + URLA_5B.map(d => urlaQuestion(p, d)).join('') +
+    sectionHead('Section 7: Military Service', 'This section asks questions about your (or your deceased spouse’s) military service.') +
+    `<div class="decl-item" data-q="militaryServed"><span class="decl-text">${uesc(URLA_MILITARY_Q)}</span>` +
+      `<div class="decl-toggle"><input type="radio" name="${mil}Served" id="${mil}Served_n" value="No"><label for="${mil}Served_n">No</label>` +
+      `<input type="radio" name="${mil}Served" id="${mil}Served_y" value="Yes"><label for="${mil}Served_y">Yes</label></div></div>` +
+    `<div class="decl-item urla-sub urla-stack" data-parent="${mil}Served" hidden><span class="decl-text">If YES, check all that apply:</span>` +
+      urlaChecks(mil + 'Status', URLA_MILITARY_OPTS, 'urla-one') +
+      `<div class="form-group urla-date" data-show-for="${mil}Status:ActiveDuty" hidden style="max-width:240px;margin-top:8px">` +
+        `<label for="${mil}Expiration">Projected expiration date (mm/dd/yyyy)</label>` +
+        `<input type="text" id="${mil}Expiration" name="${mil}Expiration" placeholder="MM/DD/YYYY" inputmode="numeric" maxlength="10" autocomplete="off"></div></div>` +
+    sectionHead('Section 8: Demographic Information', 'This section asks about your ethnicity, sex, and race.') +
+    `<p class="urla-disclosure">${uesc(URLA_DEMO_DISCLOSURE)}</p>` +
+    `<p class="urla-demo-h">Ethnicity: Check one or more</p>` + urlaChecks(p + '_eth', URLA_ETH, 'urla-excl') +
+    `<div class="urla-nest" data-show-for="${p}_eth:HispanicOrLatino" hidden>` + urlaChecks(p + '_ethOrigin', URLA_ETH_ORIGIN) +
+      `<div class="form-group urla-text" data-show-for="${p}_ethOrigin:Other" hidden><input type="text" name="${p}_ethOther" maxlength="100" placeholder="For example: Argentinean, Colombian, Dominican, Nicaraguan, Salvadoran, Spaniard, and so on." aria-label="Other Hispanic or Latino origin"></div></div>` +
+    `<p class="urla-demo-h">Sex</p>` + urlaChecks(p + '_sex', URLA_SEX, 'urla-excl') +
+    `<p class="urla-demo-h">Race: Check one or more</p>` + urlaChecks(p + '_race', URLA_RACE, 'urla-excl urla-one') +
+    `<div class="form-group urla-text urla-nest" data-show-for="${p}_race:AmericanIndianOrAlaskaNative" hidden><input type="text" name="${p}_raceTribe" maxlength="100" placeholder="Name of enrolled or principal tribe" aria-label="Name of enrolled or principal tribe"></div>` +
+    `<div class="urla-nest" data-show-for="${p}_race:Asian" hidden>` + urlaChecks(p + '_raceAsian', URLA_ASIAN) +
+      `<div class="form-group urla-text" data-show-for="${p}_raceAsian:OtherAsian" hidden><input type="text" name="${p}_raceOtherAsian" maxlength="100" placeholder="For example: Hmong, Laotian, Thai, Pakistani, Cambodian, and so on." aria-label="Other Asian race"></div></div>` +
+    `<div class="urla-nest" data-show-for="${p}_race:NativeHawaiianOrOtherPacificIslander" hidden>` + urlaChecks(p + '_racePI', URLA_PI) +
+      `<div class="form-group urla-text" data-show-for="${p}_racePI:OtherPacificIslander" hidden><input type="text" name="${p}_raceOtherPI" maxlength="100" placeholder="For example: Fijian, Tongan, and so on." aria-label="Other Pacific Islander race"></div></div>` +
+    '</div>';
+}
+
+// Show/hide conditional rows. A hidden row's answers are cleared so a stale answer to a question
+// the applicant can no longer see is never stored or exported.
+function urlaApplyVisibility() {
+  const purchase = (form.loanPurpose && form.loanPurpose.value) === 'Purchase';
+  document.querySelectorAll('.urla-block [data-parent]').forEach(row => {
+    const par = form.elements[row.dataset.parent];
+    const show = !!(par && par.value === 'Yes');
+    urlaToggle(row, show);
   });
+  document.querySelectorAll('.urla-block [data-purchase-only]').forEach(row => urlaToggle(row, purchase));
+  document.querySelectorAll('.urla-block [data-show-for]').forEach(el => {
+    const [name, val] = el.dataset.showFor.split(':');
+    const box = document.querySelector(`.urla-block input[name="${name}"][value="${val}"]`);
+    urlaToggle(el, !!(box && box.checked && !box.closest('[hidden]')));
+  });
+}
+function urlaToggle(el, show) {
+  if (show) { el.hidden = false; return; }
+  if (el.hidden) return;
+  el.hidden = true;
+  el.querySelectorAll('input').forEach(i => {
+    if (i.type === 'radio' || i.type === 'checkbox') i.checked = false; else i.value = '';
+  });
+  el.querySelectorAll('.decl-toggle label').forEach(l => l.classList.remove('sel'));
+}
+
+function urlaMount() {
+  document.getElementById('urlaBorrower').innerHTML = renderUrlaBlock('b', '');
+  urlaApplyVisibility();
+}
+function urlaSyncCoBorrower() {
+  const box = document.getElementById('urlaCoBorrower');
+  const on = document.getElementById('addCoBorrower').checked;
+  if (!on) { box.hidden = true; box.innerHTML = ''; return; }
+  const nm = [form.elements.coBorrFirstName.value, form.elements.coBorrLastName.value].filter(Boolean).join(' ').trim();
+  const heading = 'Co-Borrower' + (nm ? ': ' + nm : '');
+  if (!box.innerHTML) box.innerHTML = renderUrlaBlock('cb', heading);
+  else box.querySelector('.urla-who').textContent = heading;
+  box.hidden = false;
+  urlaApplyVisibility();
+}
+
+// One delegated listener: yes/no highlight, category exclusivity ("do not wish to provide" clears
+// the others, picking another clears it), then re-evaluate every conditional row.
+document.getElementById('urlaRoot').addEventListener('change', e => {
+  const t = e.target;
+  const miss = t.closest('.urla-missing');
+  if (miss) miss.classList.remove('urla-missing');
+  if (t.type === 'radio' && t.closest('.decl-toggle')) {
+    t.closest('.decl-toggle').querySelectorAll('label').forEach(l => l.classList.remove('sel'));
+    const lbl = document.querySelector(`label[for="${t.id}"]`);
+    if (lbl && t.checked) lbl.classList.add('sel');
+  }
+  if (t.type === 'checkbox' && t.closest('.urla-excl') && t.checked) {
+    const group = document.querySelectorAll(`.urla-block input[name="${t.name}"]`);
+    if (t.value === 'Refused') group.forEach(g => { if (g !== t) g.checked = false; });
+    else group.forEach(g => { if (g.value === 'Refused') g.checked = false; });
+  }
+  urlaApplyVisibility();
 });
+
+const urlaVals = name => Array.from(document.querySelectorAll(`.urla-block input[name="${name}"]:checked`)).map(i => i.value);
+const urlaVisible = el => el && !el.closest('[hidden]');
+
+// Collect one borrower's answers into the stored shape. Only visible, answered questions are kept.
+function collectUrla(p) {
+  const declarations = { _form: 'URLA 1/2021' };
+  URLA_ALL.forEach(d => {
+    const row = document.querySelector(`.urla-block[data-urla="${p}"] [data-q="${d.k}"]`);
+    if (!urlaVisible(row)) return;
+    const n = p + '_' + d.k;
+    let answer = null, label = null;
+    if (d.t === 'yn' || d.t === 'choice') {
+      const el = form.elements[n];
+      answer = el && el.value ? el.value : null;
+      if (d.t === 'choice' && answer) label = (d.opts.find(o => o[0] === answer) || [])[1] || null;
+    } else if (d.t === 'multi') {
+      const v = urlaVals(n); answer = v.length ? v : null;
+    } else if (d.t === 'amount') {
+      const v = parseFloat((form.elements[n] && form.elements[n].value || '').replace(/[^0-9.]/g, ''));
+      answer = isNaN(v) ? null : v;
+    }
+    if (answer == null) return;
+    declarations[d.k] = label ? { question: d.q, answer, answer_label: label } : { question: d.q, answer };
+  });
+
+  const mil = p + '_military';
+  const servedEl = form.elements[mil + 'Served'];
+  const served = servedEl && servedEl.value ? servedEl.value === 'Yes' : null;
+  const statuses = served ? urlaVals(mil + 'Status') : [];
+  const exp = (form.elements[mil + 'Expiration'] && form.elements[mil + 'Expiration'].value) || '';
+  const military = served == null ? null : {
+    question: URLA_MILITARY_Q, served,
+    statuses: statuses.filter(s => s !== 'SurvivingSpouse'),
+    surviving_spouse: statuses.includes('SurvivingSpouse'),
+    active_duty_expiration: statuses.includes('ActiveDuty') && /^\d{2}\/\d{2}\/\d{4}$/.test(exp)
+      ? exp.slice(6) + '-' + exp.slice(0, 2) + '-' + exp.slice(3, 5) : null,
+  };
+
+  const text = n => ((form.elements[n] && form.elements[n].value) || '').trim() || null;
+  const eth = urlaVals(p + '_eth'), sex = urlaVals(p + '_sex'), race = urlaVals(p + '_race');
+  const hmda = {
+    ethnicity: eth.filter(v => v !== 'Refused'), ethnicity_refused: eth.includes('Refused'),
+    ethnicity_origins: urlaVals(p + '_ethOrigin'), ethnicity_other: text(p + '_ethOther'),
+    sex: sex.filter(v => v !== 'Refused'), sex_refused: sex.includes('Refused'),
+    race: race.filter(v => v !== 'Refused'), race_refused: race.includes('Refused'),
+    race_tribe: text(p + '_raceTribe'),
+    race_designations: urlaVals(p + '_raceAsian').concat(urlaVals(p + '_racePI')),
+    race_other_asian: text(p + '_raceOtherAsian'), race_other_pi: text(p + '_raceOtherPI'),
+  };
+  return { declarations, military, hmda };
+}
+
+// Validate one borrower. Every visible declaration and the military question are required;
+// demographics are optional by law, so they are never required here.
+function validateUrla(p, who) {
+  for (const d of URLA_ALL) {
+    const row = document.querySelector(`.urla-block[data-urla="${p}"] [data-q="${d.k}"]`);
+    if (!urlaVisible(row)) continue;
+    const n = p + '_' + d.k;
+    const letter = d.l ? d.l + '. ' : '';
+    if ((d.t === 'yn' || d.t === 'choice') && !(form.elements[n] && form.elements[n].value))
+      return { row, msg: `${who}: please answer declaration ${letter}“${d.q.slice(0, 70)}…”` };
+    if (d.t === 'multi' && !urlaVals(n).length)
+      return { row, msg: `${who}: please identify the type(s) of bankruptcy.` };
+    if (d.t === 'amount') {
+      const v = parseFloat(((form.elements[n] && form.elements[n].value) || '').replace(/[^0-9.]/g, ''));
+      if (!(v > 0)) return { row, msg: `${who}: please enter the amount of money not disclosed on this application.` };
+    }
+  }
+  const mil = p + '_military';
+  const milRow = document.querySelector(`.urla-block[data-urla="${p}"] [data-q="militaryServed"]`);
+  if (!(form.elements[mil + 'Served'] && form.elements[mil + 'Served'].value))
+    return { row: milRow, msg: `${who}: please answer the military service question.` };
+  if (form.elements[mil + 'Served'].value === 'Yes') {
+    const st = urlaVals(mil + 'Status');
+    if (!st.length) return { row: milRow, msg: `${who}: please check at least one military service option.` };
+    if (st.includes('ActiveDuty')) {
+      const exp = (form.elements[mil + 'Expiration'].value || '').trim();
+      const dt = parseStrictDate(exp);
+      if (!dt) return { row: milRow, msg: `${who}: please enter the projected expiration date of service as MM/DD/YYYY.` };
+      if (dt < new Date(new Date().toDateString())) return { row: milRow, msg: `${who}: the projected expiration date of active duty cannot be in the past.` };
+    }
+  }
+  return null;
+}
+
+// Human-readable summary used by the review screen and the legacy summary columns.
+function urlaLabel(list, v) { const f = list.find(o => o[0] === v); return f ? f[1].replace(/ – Print.*$/, '') : v; }
+// Subcategories are grouped under the answer they belong to, so a reader of the summary
+// can tell "Asian: Chinese" from "Native Hawaiian or Other Pacific Islander: Samoan".
+function urlaHmdaSummary(h) {
+  const sub = (list, picked, extra) => picked.length
+    ? ': ' + picked.map(v => urlaLabel(list, v) + (extra(v) ? ' (' + extra(v) + ')' : '')).join(', ') : '';
+  const eth = h.ethnicity_refused ? [URLA_REFUSE] : h.ethnicity.map(v => urlaLabel(URLA_ETH, v)
+    + (v === 'HispanicOrLatino' ? sub(URLA_ETH_ORIGIN, h.ethnicity_origins, o => o === 'Other' && h.ethnicity_other) : ''));
+  const race = h.race_refused ? [URLA_REFUSE] : h.race.map(v => urlaLabel(URLA_RACE, v)
+    + (v === 'AmericanIndianOrAlaskaNative' && h.race_tribe ? ' (' + h.race_tribe + ')' : '')
+    + (v === 'Asian' ? sub(URLA_ASIAN, h.race_designations.filter(d => URLA_ASIAN.some(o => o[0] === d)), d => d === 'OtherAsian' && h.race_other_asian) : '')
+    + (v === 'NativeHawaiianOrOtherPacificIslander' ? sub(URLA_PI, h.race_designations.filter(d => URLA_PI.some(o => o[0] === d)), d => d === 'OtherPacificIslander' && h.race_other_pi) : ''));
+  const sex = h.sex_refused ? [URLA_REFUSE] : h.sex.map(v => urlaLabel(URLA_SEX, v));
+  return { ethnicity: eth.join('; '), race: race.join('; '), sex: sex.join(', ') };
+}
+
+const URLA_CITIZEN = [['USCitizen', 'U.S. Citizen'], ['PermanentResidentAlien', 'Permanent Resident Alien'],
+  ['NonPermanentResidentAlien', 'Non-Permanent Resident Alien']];
+const urlaCitizenLabel = v => v ? urlaLabel(URLA_CITIZEN, v) : '—';
 
 // Step management
 const stepData = [
@@ -580,7 +863,7 @@ const stepData = [
   {title:'Current Address',sub:'Where do you live now?'},
   {title:'Employment',sub:'Tell us about your work'},
   {title:'Assets & Debts',sub:'Your financial picture'},
-  {title:'Declarations',sub:'Standard mortgage questions'},
+  {title:'Declarations & Demographics',sub:'Questions the Uniform Residential Loan Application asks every borrower'},
   {title:'Documents',sub:'Upload supporting files (optional)'},
   {title:'Review & Submit',sub:'Almost done — verify and sign'}
 ];
@@ -596,6 +879,7 @@ function updateUI(){
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   const activeStep = document.querySelector(`.step[data-step="${currentStep}"]`);
   activeStep.classList.add('active');
+  if(currentStep===7){ urlaSyncCoBorrower(); urlaApplyVisibility(); }
   document.getElementById('stepTitle').textContent = stepData[currentStep-1].title;
   document.getElementById('stepSubtitle').textContent = stepData[currentStep-1].sub;
   document.getElementById('progressFill').style.width = (currentStep/totalSteps*100)+'%';
@@ -700,6 +984,7 @@ document.getElementById('downPaymentInput').addEventListener('blur', calcLoanAmo
 // Co-borrower toggle
 document.getElementById('addCoBorrower').addEventListener('change',function(){
   document.getElementById('coBorrowerBlock').style.display = this.checked?'block':'none';
+  urlaSyncCoBorrower();
 });
 
 // Show/hide previous address
@@ -835,18 +1120,6 @@ if(coBorrSsnField){
   });
 }
 
-// HMDA: "I do not wish to provide" on Race clears the specific races, and vice versa
-const raceDecline = document.querySelector('[name="hmdaRace"][value="I do not wish to provide"]');
-const raceSpecific = Array.from(document.querySelectorAll('[name="hmdaRace"]')).filter(el => el !== raceDecline);
-if(raceDecline){
-  raceDecline.addEventListener('change', () => {
-    if(raceDecline.checked) raceSpecific.forEach(el => { el.checked = false; });
-  });
-  raceSpecific.forEach(el => el.addEventListener('change', () => {
-    if(el.checked) raceDecline.checked = false;
-  }));
-}
-
 // Currency formatting (exclude phone/tel fields, SSN, DOB, ZIP, dependents, empStartDate)
 // BUG-3: strip non-numeric on input; BUG-9: cap at CURRENCY_MAX
 function isCurrencyField(inp){
@@ -936,6 +1209,8 @@ function validateStep(step){
   clearError();
   setGroupError('err-loanPurpose', false);
   setGroupError('err-propertyType', false);
+  setGroupError('err-citizenship', false);
+  setGroupError('err-coBorrCitizenship', false);
   let valid = true;
   let firstBad = null;
   const el = document.querySelector(`.step[data-step="${step}"]`);
@@ -1011,6 +1286,9 @@ function validateStep(step){
   });
 
   if(step===3){
+    // URLA 1a citizenship - required for the borrower, and for the co-borrower when one is added.
+    if(!form.citizenship.value){ setGroupError('err-citizenship', true); valid = false; }
+    if(document.getElementById('addCoBorrower')?.checked && !form.coBorrCitizenship.value){ setGroupError('err-coBorrCitizenship', true); valid = false; }
     // NEW-1 fix: strict DOB parsing catches Feb 30, 13/45/1990, 99/99/1999 etc.
     // NEW-3 fix: specific error text based on actual failure mode.
     const dobField = document.querySelector('[name="dob"]');
@@ -1141,18 +1419,14 @@ function validateStep(step){
   }
 
   if(step===7){
-    // Validate all declarations are answered
-    const declGroups = document.querySelectorAll('.decl-toggle');
-    for(let i=0; i<declGroups.length; i++){
-      const answered = declGroups[i].querySelector('input[type="radio"]:checked');
-      if(!answered){
-        const container = declGroups[i].closest('.decl-item');
-        if(container && isVisible(container)){
-          try { container.scrollIntoView({behavior:'smooth', block:'center'}); } catch(_) {}
-        }
-        showError('Please answer all declaration questions before continuing.');
-        return false;
-      }
+    // URLA Sections 5 and 7 for every borrower. Section 8 is optional by law and never required.
+    const cbOn = document.getElementById('addCoBorrower').checked;
+    const cbName = [form.coBorrFirstName.value, form.coBorrLastName.value].filter(Boolean).join(' ').trim() || 'Co-Borrower';
+    const prob = validateUrla('b', 'Borrower') || (cbOn ? validateUrla('cb', cbName) : null);
+    if(prob){
+      showError(prob.msg);
+      if(prob.row){ prob.row.classList.add('urla-missing'); if(isVisible(prob.row)){ try { prob.row.scrollIntoView({behavior:'smooth', block:'center'}); } catch(_) {} } }
+      return false;
     }
   }
 
@@ -1300,19 +1574,9 @@ function buildReview(){
     ['DOB', gv('dob')],
     ['SSN', ssnMasked],
     ['Marital Status', gv('maritalStatus')],
+    ['Citizenship', urlaCitizenLabel(form.citizenship ? form.citizenship.value : '')],
     ['Dependents', gv('dependents')]
   ]});
-
-  // --- Demographic Information (BUG-22: race and ethnicity are separate questions) ---
-  (function(){
-    const eth = (document.querySelector('[name="hmdaEthnicity"]:checked')||{}).value || '—';
-    const races = Array.from(document.querySelectorAll('[name="hmdaRace"]:checked')).map(el=>el.value);
-    sections.push({title:'Demographic Information', rows:[
-      ['Ethnicity', eth],
-      ['Race', races.length ? races.join(', ') : '—'],
-      ['Sex', gv('sex')]
-    ]});
-  })();
 
   // --- Co-Borrower (BUG-6) ---
   if(document.getElementById('addCoBorrower').checked){
@@ -1324,7 +1588,8 @@ function buildReview(){
       ['Phone', gv('coBorrPhone')],
       ['DOB', gv('coBorrDob')],
       ['SSN', cbSsnMasked],
-      ['Marital Status', gv('coBorrMarital')]
+      ['Marital Status', gv('coBorrMarital')],
+      ['Citizenship', urlaCitizenLabel(form.coBorrCitizenship ? form.coBorrCitizenship.value : '')]
     ]});
   }
 
@@ -1391,13 +1656,27 @@ function buildReview(){
     ['Other Mortgage', moneyOrDash('debtMortgage')]
   ]});
 
-  // --- Declarations (BUG-6) ---
-  const declRows = declQuestions.map((q,i)=>{
-    const el = form.elements[`decl${i}`];
-    const ans = el && el.value ? el.value : 'Unanswered';
-    return [q, ans];
-  });
-  sections.push({title:'Declarations', rows: declRows});
+  // --- URLA Sections 5, 7, 8 for each borrower (ticket #306): what the applicant is certifying ---
+  const urlaReview = (p, who) => {
+    const u = collectUrla(p);
+    const dRows = URLA_ALL.filter(d => u.declarations[d.k]).map(d => {
+      const a = u.declarations[d.k];
+      let ans = a.answer_label || a.answer;
+      if (Array.isArray(ans)) ans = ans.map(v => ((d.opts || []).find(o => o[0] === v) || [])[1] || v).join(', ');
+      if (d.t === 'amount') ans = fmtMoney(a.answer);
+      return [(d.l ? d.l + '. ' : '') + d.q, ans];
+    });
+    sections.push({title: who + 'Declarations', rows: dRows.length ? dRows : [['Declarations', '\u2014']]});
+    const m = u.military;
+    const mRows = [['Served in the U.S. Armed Forces', m ? (m.served ? 'Yes' : 'No') : '\u2014']];
+    if (m && m.served) mRows.push(['Status', m.statuses.map(s => urlaLabel(URLA_MILITARY_OPTS, s)).concat(m.surviving_spouse ? ['Surviving spouse'] : []).join('; ') || '\u2014']);
+    if (m && m.active_duty_expiration) mRows.push(['Projected expiration of active duty', m.active_duty_expiration]);
+    sections.push({title: who + 'Military Service', rows: mRows});
+    const h = urlaHmdaSummary(u.hmda);
+    sections.push({title: who + 'Demographic Information', rows: [['Ethnicity', h.ethnicity || 'Not provided'], ['Sex', h.sex || 'Not provided'], ['Race', h.race || 'Not provided']]});
+  };
+  urlaReview('b', '');
+  if (document.getElementById('addCoBorrower').checked) urlaReview('cb', 'Co-Borrower ');
 
   // --- Documents ---
   sections.push({title:'Documents', rows:[['Files uploaded', uploadedFiles.length+' file(s)']]});
@@ -1425,16 +1704,10 @@ function saveState(){
   try{
     const data = {};
     new FormData(form).forEach((v,k)=>{ if(!SENSITIVE.has(k)) data[k] = v; });
-    // Multi-value collectors
-    const raceEls = document.querySelectorAll('[name="hmdaRace"]:checked');
-    data.__hmdaRace = Array.from(raceEls).map(el=>el.value);
-    // Declarations
-    const decls = {};
-    declQuestions.forEach((q,i)=>{
-      const el = form.elements[`decl${i}`];
-      if(el && el.value) decls['decl'+i] = el.value;
-    });
-    data.__declarations = decls;
+    // Every checked checkbox by name and value: race, ethnicity origin, bankruptcy chapters,
+    // military status... FormData keeps only one value per repeated name, so it cannot carry these.
+    data.__checks = Array.from(form.querySelectorAll('input[type="checkbox"]:checked'))
+      .filter(i => i.name && i.name !== 'addCoBorrower').map(i => [i.name, i.value]);
     data.__step = currentStep;
     data.__addCoBorrower = document.getElementById('addCoBorrower').checked;
     sessionStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
@@ -1446,6 +1719,12 @@ function restoreState(){
     if(!raw) return;
     _restoreInProgress = true;
     const data = JSON.parse(raw);
+    // The co-borrower URLA block must exist before its saved answers can be applied to it.
+    if(data.__addCoBorrower){
+      document.getElementById('addCoBorrower').checked = true;
+      document.getElementById('coBorrowerBlock').style.display = 'block';
+      urlaSyncCoBorrower();
+    }
     Object.entries(data).forEach(([k,v])=>{
       if(k.startsWith('__')) return;
       const els = form.elements[k];
@@ -1459,20 +1738,15 @@ function restoreState(){
         els.value = v;
       }
     });
-    // Race/Ethnicity
-    if(Array.isArray(data.__hmdaRace)){
-      data.__hmdaRace.forEach(val=>{
-        const box = document.querySelector(`[name="hmdaRace"][value="${val.replace(/"/g,'\\"')}"]`);
-        if(box) box.checked = true;
-      });
-    }
-    // Declarations
-    if(data.__declarations){
-      Object.entries(data.__declarations).forEach(([k,v])=>{
-        const inp = document.querySelector(`input[name="${k}"][value="${v}"]`);
-        if(inp){ inp.checked = true; inp.dispatchEvent(new Event('change',{bubbles:true})); }
-      });
-    }
+    // Checkbox groups, then re-evaluate every conditional URLA row against what was restored.
+    (Array.isArray(data.__checks) ? data.__checks : []).forEach(([n, v]) => {
+      const box = Array.from(form.querySelectorAll('input[type="checkbox"]')).find(i => i.name === n && i.value === v);
+      if (box) box.checked = true;
+    });
+    urlaApplyVisibility();
+    document.querySelectorAll('.urla-block .decl-toggle input:checked').forEach(i => {
+      const l = document.querySelector(`label[for="${i.id}"]`); if (l) l.classList.add('sel');
+    });
     // Co-borrower toggle
     if(data.__addCoBorrower){
       const cb = document.getElementById('addCoBorrower');
@@ -1611,13 +1885,11 @@ btnSubmit.addEventListener('click',async()=>{
   data.submittedAt = new Date().toISOString();
   data.filesCount = uploadedFiles.length;
 
-  // Declarations
-  const decls={};
-  declQuestions.forEach((q,i)=>{
-    const v = form.elements[`decl${i}`]?.value;
-    decls[`decl_${i}`] = {question:q, answer:v||'Unanswered'};
-  });
-  data.declarations = decls;
+  // URLA Sections 5, 7, 8 (ticket #306). declarations is keyed by MISMO/ULAD element and keeps the
+  // exact question text, so the stored record shows what the applicant was actually asked.
+  const urlaB = collectUrla('b');
+  const urlaCB = document.getElementById('addCoBorrower').checked ? collectUrla('cb') : null;
+  data.declarations = urlaB.declarations;
 
   btnSubmit.disabled=true;
   btnSubmit.innerHTML='<span class="spinner"></span>Submitting…';
@@ -1635,18 +1907,19 @@ btnSubmit.addEventListener('click',async()=>{
         'Authorization':'Bearer '+SUPABASE_KEY
       },
       body:JSON.stringify((function(){
-        // Gather race/ethnicity checkboxes
-        const raceEls = document.querySelectorAll('[name="hmdaRace"]:checked');
-        const raceArr = Array.from(raceEls).map(el=>el.value);
-        const ethnicityVal = (document.querySelector('[name="hmdaEthnicity"]:checked')||{}).value || '';
+        const hB = urlaB.hmda, sumB = urlaHmdaSummary(hB);
         // Gather co-borrower if enabled
         let coBorrower = null;
-        if(document.getElementById('addCoBorrower').checked){
+        if(urlaCB){
           coBorrower = {
             first_name:data.coBorrFirstName||'',last_name:data.coBorrLastName||'',
             email:data.coBorrEmail||'',phone:data.coBorrPhone||'',
             dob:(function(d){if(!d)return'';const p=d.split('/');return p.length===3?p[2]+'-'+p[0]+'-'+p[1]:d;})(data.coBorrDob),ssn_last4:(data.coBorrSsn||'').replace(/\D/g,'').slice(-4),
-            marital_status:data.coBorrMarital||''
+            marital_status:data.coBorrMarital||'',
+            citizenship:data.coBorrCitizenship||null,
+            declarations:urlaCB.declarations,
+            military:urlaCB.military,
+            hmda:urlaCB.hmda
           };
         }
         const parseCurrency = v=>{const n=parseFloat((v||'').replace(/[^0-9.]/g,''));return isNaN(n)?null:n;};
@@ -1701,12 +1974,16 @@ btnSubmit.addEventListener('click',async()=>{
           down_payment_source:data.downPaymentSource||'',
           cash_out_amount:(data.loanPurpose==='Cash-Out Refi') ? parseCurrency(data.cashOutAmount) : null,
           estimated_credit_score:data.estimatedCreditScore||'',
-          hmda_ethnicity:ethnicityVal||null,
-          hmda_race:raceArr.length?raceArr.join(', '):null,
-          hmda_sex:data.sex||null,
+          hmda_ethnicity:sumB.ethnicity||null,
+          hmda_race:sumB.race||null,
+          hmda_sex:sumB.sex||null,
           // kept populated for backward compatibility with existing readers
-          race_ethnicity:(function(){const c=raceArr.slice();if(ethnicityVal)c.push(ethnicityVal);return c.length?c:null;})(),
-          sex:data.sex||'',
+          race_ethnicity:(function(){const c=hB.race.map(v=>urlaLabel(URLA_RACE,v)).concat(hB.ethnicity.map(v=>urlaLabel(URLA_ETH,v)));return c.length?c:null;})(),
+          sex:hB.sex_refused?URLA_REFUSE:(hB.sex.map(v=>urlaLabel(URLA_SEX,v)).join(', ')||''),
+          citizenship_status:data.citizenship||null,
+          co_citizenship_status:urlaCB?(data.coBorrCitizenship||null):null,
+          military:urlaB.military,
+          hmda_detail:hB,
           co_borrower:coBorrower,
           checking_balance:parseCurrency(data.checkingBal),
           savings_balance:parseCurrency(data.savingsBal),
@@ -1793,6 +2070,8 @@ btnSubmit.addEventListener('click',async()=>{
   document.getElementById('successScreen').style.display='block';
 });
 
+// Mount the URLA sections before restoring, so saved answers have somewhere to land.
+urlaMount();
 // Restore any saved state, then paint
 restoreState();
 updateUI();
