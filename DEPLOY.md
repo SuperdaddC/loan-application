@@ -5,7 +5,10 @@
 - **Branch:** `main`
 - **Repo:** SuperdaddC/loan-application
 - **Hosting:** Netlify (site: enchanting-semolina-788344)
-- **Deploy method:** `netlify deploy --prod` via CLI (Netlify git-builds disabled — private repo requires GitHub App linking)
+- **Deploy method:** `./deploy.sh prod` (Netlify CLI). Git builds are not linked, so **merging publishes nothing**.
+- **Published folder:** `site/` only. The repo is public on GitHub, but the site must not serve the
+  repo root: until 2026-09-21 a `--dir=.` deploy published WISP.md, INCIDENT_RESPONSE.md, COMPLIANCE.md
+  and shell scripts at apply.thecolyerteam.com. Never deploy with `--dir=.`.
 
 ## Staging
 - **URL:** https://staging--enchanting-semolina-788344.netlify.app
@@ -15,10 +18,8 @@
 ## Quick Deploy
 
 ```bash
-# Token must be set in your shell env — do NOT commit it.
-# Add to ~/.bashrc (or ~/.zshrc):
-#   export NETLIFY_AUTH_TOKEN=<your-personal-access-token>
-# Create a token at: https://app.netlify.com/user/applications#personal-access-tokens
+# Auth: NETLIFY_AUTH_TOKEN if set, otherwise the CLI's stored `netlify login`. Never commit a token.
+# If a stale token is exported in your shell, `unset NETLIFY_AUTH_TOKEN` first.
 
 # Deploy to staging
 ./deploy.sh staging
@@ -36,7 +37,8 @@
 5. Test on staging URL end-to-end (load app, fill all steps, submit, verify in Supabase)
 6. Once approved, merge `staging` → `main`
 7. Deploy production: `git checkout main && ./deploy.sh prod`
-8. Verify production
+8. Verify production: fetch https://apply.thecolyerteam.com/ and compare it with `site/index.html`
+   at the deployed commit, and confirm `/WISP.md` returns 404
 
 ## Rollback
 
