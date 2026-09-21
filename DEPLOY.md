@@ -5,7 +5,11 @@
 - **Branch:** `main`
 - **Repo:** SuperdaddC/loan-application
 - **Hosting:** Netlify (site: enchanting-semolina-788344)
-- **Deploy method:** `./deploy.sh prod` (Netlify CLI). Git builds are not linked, so **merging publishes nothing**.
+- **Deploy method:** **merging to `main` publishes.** The Netlify site is linked to this repo (GitHub App,
+  `stop_builds: false`), so every push to `main` builds and goes live within seconds, and every pull
+  request gets a deploy preview. `./deploy.sh prod` (Netlify CLI) also publishes, from your working tree.
+  On 2026-09-21 merging only the first of three stacked PRs published a half-finished `main` for two
+  minutes: land a stack with ONE merge into `main`, or retarget each PR to `main` and merge in order.
 - **Published folder:** `site/` only. The repo is public on GitHub, but the site must not serve the
   repo root: until 2026-09-21 a `--dir=.` deploy published WISP.md, INCIDENT_RESPONSE.md, COMPLIANCE.md
   and shell scripts at apply.thecolyerteam.com. Never deploy with `--dir=.`.
@@ -58,11 +62,8 @@
 - [ ] DB migrations applied before frontend deploy?
 - [ ] Checked Netlify deploy log for errors?
 
-## Future: Enable Auto-Deploys
+## Auto-deploys are ON
 
-To enable automatic deploys on git push (no manual CLI step), connect the Netlify GitHub App:
-1. Go to https://app.netlify.com/projects/enchanting-semolina-788344/configuration/deploys
-2. Under "Build settings", click "Link to Git provider"
-3. Authorize the Netlify GitHub App for the SuperdaddC account
-4. Select the loan-application repo, branch: main
-5. Once linked, set `stop_builds: false` and pushes will auto-deploy
+The site is linked to SuperdaddC/loan-application, branch `main`. To stop merges from publishing
+(for example during a risky change), lock the current production deploy in the Netlify dashboard
+(Deploys -> the published deploy -> "Lock to stop auto publishing") and unlock it afterwards.
